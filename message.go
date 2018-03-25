@@ -7,11 +7,12 @@ import (
 
 type Message interface {
 	Encode() []byte
+	WriteTo(w io.Writer) (int, error)
 }
 
 func ParseMessage(r io.Reader) (Message, error) {
 	// Create a buffer
-	buf := NewReadBuffer(r)
+	buf := newReadBuffer(r)
 
 	// Look at the first byte to determine the type of message we have
 	start, err := buf.PeekByte()
@@ -32,7 +33,7 @@ func ParseMessage(r io.Reader) (Message, error) {
 		return ParsePasswordMessage(buf)
 	case 'R':
 		// Authentication request
-		return nil, nil
+		return ParseAuthenticationRequest(buf)
 	case 'S':
 		// Parameter status
 		return nil, nil

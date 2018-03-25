@@ -5,77 +5,60 @@ import (
 	"testing"
 
 	"github.com/c653labs/pgmsg"
+	"github.com/stretchr/testify/suite"
 )
 
-func Test_ParseTermination(t *testing.T) {
+type TerminationTestSuite struct {
+	suite.Suite
+}
+
+func TestTerminationTestSuite(t *testing.T) {
+	suite.Run(t, new(TerminationTestSuite))
+}
+
+func (s *TerminationTestSuite) Test_ParseTermination() {
 	raw := []byte{'X', '\x00', '\x00', '\x00', '\x04'}
 
 	term, err := pgmsg.ParseTermination(bytes.NewReader(raw))
-	if err != nil {
-		t.Errorf("expected err to be nil, instead got %#v", err)
-	}
-
-	if !bytes.Equal(raw, term.Encode()) {
-		t.Errorf("expected Termination.Encode() to be the same as it's input")
-	}
+	s.Nil(err)
+	s.NotNil(term)
+	s.Equal(raw, term.Encode())
 }
 
-func Test_ParseTermination_Empty(t *testing.T) {
+func (s *TerminationTestSuite) Test_ParseTermination_Empty() {
 	term, err := pgmsg.ParseTermination(bytes.NewReader([]byte{}))
-	if err == nil {
-		t.Errorf("expected err to not be nil, instead got %#v", err)
-	}
-
-	if term != nil {
-		t.Errorf("expected term to be nil, instead got %#v", term)
-	}
+	s.NotNil(err)
+	s.Nil(term)
 }
 
-func Test_ParseTermination_InvalidTag(t *testing.T) {
+func (s *TerminationTestSuite) Test_ParseTermination_InvalidTag() {
 	// lowercase 'x' instead of uppercase 'X'
 	raw := []byte{'x', '\x00', '\x00', '\x00', '\x04'}
 
 	term, err := pgmsg.ParseTermination(bytes.NewReader(raw))
-	if err == nil {
-		t.Errorf("expected err to not be nil, instead got %#v", err)
-	}
-
-	if term != nil {
-		t.Errorf("expected term to be nil, instead got %#v", term)
-	}
+	s.NotNil(err)
+	s.Nil(term)
 }
 
-func Test_ParseTermination_InvalidLength(t *testing.T) {
+func (s *TerminationTestSuite) Test_ParseTermination_InvalidLength() {
 	// length of 3 instead of 4
 	raw := []byte{'X', '\x00', '\x00', '\x00', '\x03'}
 
 	term, err := pgmsg.ParseTermination(bytes.NewReader(raw))
-	if err == nil {
-		t.Errorf("expected err to not be nil, instead got %#v", err)
-	}
-
-	if term != nil {
-		t.Errorf("expected term to be nil, instead got %#v", term)
-	}
+	s.NotNil(err)
+	s.Nil(term)
 
 	// length of 5 instead of 4
 	raw = []byte{'X', '\x00', '\x00', '\x00', '\x05'}
 
 	term, err = pgmsg.ParseTermination(bytes.NewReader(raw))
-	if err == nil {
-		t.Errorf("expected err to not be nil, instead got %#v", err)
-	}
-
-	if term != nil {
-		t.Errorf("expected term to be nil, instead got %#v", term)
-	}
+	s.NotNil(err)
+	s.Nil(term)
 }
 
-func Test_Termination_Encode(t *testing.T) {
+func (s *TerminationTestSuite) Test_Termination_Encode() {
 	expected := []byte{'X', '\x00', '\x00', '\x00', '\x04'}
 
 	term := &pgmsg.Termination{}
-	if !bytes.Equal(expected, term.Encode()) {
-		t.Errorf("expected Termination.Encode() to be the same as it's input")
-	}
+	s.Equal(expected, term.Encode())
 }

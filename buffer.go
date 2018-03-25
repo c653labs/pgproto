@@ -8,19 +8,25 @@ import (
 	"io"
 )
 
-type ReadBuffer struct {
+type readBuffer struct {
 	*bufio.Reader
+	buffer []byte
 }
 
-func NewReadBuffer(r io.Reader) *ReadBuffer {
-	buf := &ReadBuffer{
+func newReadBuffer(r io.Reader) *readBuffer {
+	// If we already have a read buffer, don't create a new one
+	if buf, ok := r.(*readBuffer); ok {
+		return buf
+	}
+
+	buf := &readBuffer{
 		Reader: bufio.NewReader(r),
 	}
 	buf.Reader.Reset(r)
 	return buf
 }
 
-func (b *ReadBuffer) PeekByte() (byte, error) {
+func (b *readBuffer) PeekByte() (byte, error) {
 	buf, err := b.Peek(1)
 	if len(buf) == 1 {
 		return buf[0], err
@@ -29,7 +35,7 @@ func (b *ReadBuffer) PeekByte() (byte, error) {
 	return '0', err
 }
 
-func (b *ReadBuffer) ReadInt() (int, error) {
+func (b *readBuffer) ReadInt() (int, error) {
 	buf := make([]byte, 4)
 	n, err := b.Read(buf)
 	if err != nil {
@@ -42,71 +48,84 @@ func (b *ReadBuffer) ReadInt() (int, error) {
 	return int(int32(binary.BigEndian.Uint32(buf))), nil
 }
 
-func (b *ReadBuffer) ReadLength() (int, []byte, error) {
+func (b *readBuffer) ReadLength() (*readBuffer, error) {
 	l, err := b.ReadInt()
 	if err != nil {
-		return 0, nil, err
+		return nil, err
 	}
 	if l <= 0 {
-		return 0, nil, fmt.Errorf("unable to parse length from message")
+		return nil, fmt.Errorf("unable to parse length from message")
 	}
 
 	// Length needs to account for the 4 bytes of the length value that have already been parsed
 	l = l - 4
 	if l == 0 {
-		return l, []byte{}, nil
+		return nil, nil
 	}
 
 	buf := make([]byte, l)
 	n, err := b.Read(buf)
 	if err != nil {
-		return 0, nil, err
+		return nil, err
 	}
 
 	if l != n {
-		return 0, nil, fmt.Errorf("could not parse required bytes from message")
+		return nil, fmt.Errorf("could not parse required bytes from message")
 	}
 
-	return l, buf, nil
+	return newReadBuffer(bytes.NewReader(buf)), nil
 }
 
-func (b *ReadBuffer) ReadString() ([]byte, error) {
+func (b *readBuffer) ReadString() ([]byte, error) {
 	str, err := b.ReadBytes(0)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		return nil, err
 	}
 
 	return bytes.TrimRight(str, "\x00"), nil
 }
 
-type WriteBuffer struct {
+func (b *readBuffer) ReadTag(t byte) error {
+	tag, err := b.ReadByte()
+	if err != nil {
+		return err
+	}
+	if tag != t {
+		return fmt.Errorf("invalid tag '%c' for message, must be '%c'", tag, t)
+	}
+	return nil
+}
+
+type writeBuffer struct {
 	bytes []byte
 }
 
-func NewWriteBuffer() *WriteBuffer {
-	return &WriteBuffer{}
+func newWriteBuffer() *writeBuffer {
+	return &writeBuffer{}
 }
 
-func (b *WriteBuffer) Bytes() []byte {
+func (b *writeBuffer) Bytes() []byte {
 	return b.bytes
 }
 
-func (b *WriteBuffer) WriteInt(i int) {
+func (b *writeBuffer) WriteInt(i int) {
 	buf := make([]byte, 4)
 	binary.BigEndian.PutUint32(buf, uint32(i))
 	b.bytes = append(b.bytes, buf...)
 }
 
-func (b *WriteBuffer) WriteByte(c byte) {
-	b.bytes = append([]byte{c}, b.bytes...)
+func (b *writeBuffer) WriteByte(c byte) {
+	b.bytes = append(b.bytes, c)
 }
 
-func (b *WriteBuffer) WriteString(buf []byte) {
+func (b *writeBuffer) WriteString(buf []byte, null bool) {
 	b.bytes = append(b.bytes, buf...)
-	b.bytes = append(b.bytes, '\x00')
+	if null {
+		b.bytes = append(b.bytes, '\x00')
+	}
 }
 
-func (b *WriteBuffer) PrependLength() {
+func (b *writeBuffer) PrependLength() {
 	// Need to include the 4 bytes as part of the length
 	l := len(b.bytes) + 4
 	buf := make([]byte, 4)
@@ -114,6 +133,11 @@ func (b *WriteBuffer) PrependLength() {
 	b.bytes = append(buf, b.bytes...)
 }
 
-func (b *WriteBuffer) PrependByte(c byte) {
+func (b *writeBuffer) PrependByte(c byte) {
 	b.bytes = append([]byte{c}, b.bytes...)
+}
+
+func (b *writeBuffer) Wrap(t byte) {
+	b.PrependLength()
+	b.PrependByte(t)
 }

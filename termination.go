@@ -8,12 +8,12 @@ import (
 type Termination struct{}
 
 func ParseTermination(r io.Reader) (*Termination, error) {
-	b := NewReadBuffer(r)
+	b := newReadBuffer(r)
 
 	// 'X' [int32 - length]
-	tag, err := b.ReadByte()
-	if tag != 'X' {
-		return nil, fmt.Errorf("invalid tag '%c' for termination message, msut be 'X'", tag)
+	err := b.ReadTag('X')
+	if err != nil {
+		return nil, err
 	}
 
 	l, err := b.ReadInt()
@@ -28,8 +28,11 @@ func ParseTermination(r io.Reader) (*Termination, error) {
 
 func (t *Termination) Encode() []byte {
 	// 'X' [int32 - length]
-	w := NewWriteBuffer()
-	w.WriteByte('X')
-	w.WriteInt(4)
+	w := newWriteBuffer()
+	w.Wrap('X')
 	return w.Bytes()
+}
+
+func (t *Termination) WriteTo(w io.Writer) (int, error) {
+	return w.Write(t.Encode())
 }
