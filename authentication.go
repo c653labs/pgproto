@@ -11,7 +11,7 @@ type AuthenticationMethod int
 // Available authentication methods
 const (
 	AuthenticationMethodOK        AuthenticationMethod = 0
-	AuthenticationMethodPlaintext AuthenticationMethod = 1
+	AuthenticationMethodPlaintext AuthenticationMethod = 3
 	AuthenticationMethodMD5       AuthenticationMethod = 5
 )
 
