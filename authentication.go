@@ -48,7 +48,7 @@ func ParseAuthenticationRequest(r io.Reader) (*AuthenticationRequest, error) {
 	}
 
 	if a.Method == AUTHENTICATION_MD5 {
-		a.Salt, err = buf.ReadString()
+		a.Salt, err = buf.ReadString(false)
 		if err != nil {
 			return nil, err
 		}

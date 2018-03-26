@@ -1,7 +1,6 @@
 package pgmsg
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/binary"
 	"fmt"
@@ -9,8 +8,7 @@ import (
 )
 
 type readBuffer struct {
-	*bufio.Reader
-	buffer []byte
+	io.Reader
 }
 
 func newReadBuffer(r io.Reader) *readBuffer {
@@ -20,19 +18,9 @@ func newReadBuffer(r io.Reader) *readBuffer {
 	}
 
 	buf := &readBuffer{
-		Reader: bufio.NewReader(r),
+		Reader: r,
 	}
-	buf.Reader.Reset(r)
 	return buf
-}
-
-func (b *readBuffer) PeekByte() (byte, error) {
-	buf, err := b.Peek(1)
-	if len(buf) == 1 {
-		return buf[0], err
-	}
-
-	return '0', err
 }
 
 func (b *readBuffer) ReadInt() (int, error) {
@@ -45,7 +33,7 @@ func (b *readBuffer) ReadInt() (int, error) {
 		return 0, io.EOF
 	}
 
-	return int(int32(binary.BigEndian.Uint32(buf))), nil
+	return bytesToInt(buf), nil
 }
 
 func (b *readBuffer) ReadLength() (*readBuffer, error) {
@@ -76,13 +64,45 @@ func (b *readBuffer) ReadLength() (*readBuffer, error) {
 	return newReadBuffer(bytes.NewReader(buf)), nil
 }
 
-func (b *readBuffer) ReadString() ([]byte, error) {
-	str, err := b.ReadBytes(0)
+func (b *readBuffer) ReadByte() (c byte, err error) {
+	buf := make([]byte, 1)
+	l, err := b.Read(buf)
+	if l == 1 {
+		c = buf[0]
+	}
+	return
+}
+
+func (b *readBuffer) ReadUntil(c byte) ([]byte, error) {
+	buf := make([]byte, 0)
+	for {
+		n, err := b.ReadByte()
+		if err == io.EOF {
+			return buf, err
+		} else if err != nil {
+			return nil, err
+		}
+
+		buf = append(buf, n)
+		if n == c {
+			break
+		}
+	}
+
+	return buf, nil
+}
+
+func (b *readBuffer) ReadString(trimNull bool) ([]byte, error) {
+	str, err := b.ReadUntil('\x00')
 	if err != nil && err != io.EOF {
 		return nil, err
 	}
 
-	return bytes.TrimRight(str, "\x00"), nil
+	if trimNull {
+		str = bytes.TrimRight(str, "\x00")
+	}
+
+	return str, nil
 }
 
 func (b *readBuffer) ReadTag(t byte) error {
@@ -114,6 +134,10 @@ func (b *writeBuffer) WriteInt(i int) {
 	b.bytes = append(b.bytes, buf...)
 }
 
+func (b *writeBuffer) WriteBytes(buf []byte) {
+	b.bytes = append(b.bytes, buf...)
+}
+
 func (b *writeBuffer) WriteByte(c byte) {
 	b.bytes = append(b.bytes, c)
 }
@@ -140,4 +164,8 @@ func (b *writeBuffer) PrependByte(c byte) {
 func (b *writeBuffer) Wrap(t byte) {
 	b.PrependLength()
 	b.PrependByte(t)
+}
+
+func (b *writeBuffer) Reader() *readBuffer {
+	return newReadBuffer(bytes.NewReader(b.Bytes()))
 }

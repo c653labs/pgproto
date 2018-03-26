@@ -32,25 +32,21 @@ func ParseStartupMessage(r io.Reader) (*StartupMessage, error) {
 
 	// Parse the key/value pairs
 	for {
-		// Check if the next byte is a null terminator
-		// DEV: This message ends in a null terminator
-		n, err := buf.PeekByte()
-		if n == '\x00' {
-			break
-		} else if err == io.EOF {
-			break
-		} else if err != nil {
-			return nil, err
-		}
-
-		key, err := buf.ReadString()
+		key, err := buf.ReadString(false)
 		if err == io.EOF {
 			break
 		} else if err != nil {
 			return nil, err
 		}
 
-		value, err := buf.ReadString()
+		// This message ends in a single null terminator
+		if bytes.Equal(key, []byte{'\x00'}) {
+			break
+		}
+		// The key is [string] \0, we keep the \0 until now for the previous check
+		key = bytes.TrimRight(key, "\x00")
+
+		value, err := buf.ReadString(true)
 		if err != nil {
 			return nil, err
 		}

@@ -24,7 +24,7 @@ func ParsePasswordMessage(r io.Reader) (*PasswordMessage, error) {
 
 	p := &PasswordMessage{}
 
-	p.Password, err = buf.ReadString()
+	p.Password, err = buf.ReadString(true)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,6 @@ func (p *PasswordMessage) Encode() []byte {
 	w.WriteString(p.Password, true)
 	w.Wrap('p')
 	return w.Bytes()
-
 }
 
 func (p *PasswordMessage) WriteTo(w io.Writer) (int, error) {
