@@ -103,6 +103,12 @@ func ParseMessage(r io.Reader) (Message, error) {
 		case 'D':
 			// Data row
 			return ParseDataRow(w.Reader())
+		case 'I':
+			// Empty row
+			return nil, nil
+		case 'B':
+			// Binary parameters
+			return nil, nil
 		case 'E':
 			// Error message
 			return ParseError(w.Reader())
