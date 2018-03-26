@@ -31,7 +31,7 @@ func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_MD5() {
 	auth, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
 	s.Nil(err)
 	s.NotNil(auth)
-	s.Equal(auth.Method, pgproto.AUTHENTICATION_MD5)
+	s.Equal(auth.Method, pgproto.AuthenticationMethodMD5)
 	s.Equal(auth.Salt, []byte{'\xd1', '\x5b', '\x0e', '\x4f'})
 	s.Equal(raw, auth.Encode())
 }
@@ -55,7 +55,7 @@ func (s *AuthenticationRequestTestSuite) Test_AuthenticationRequestEncode_MD5() 
 	}
 
 	a := &pgproto.AuthenticationRequest{
-		Method: pgproto.AUTHENTICATION_MD5,
+		Method: pgproto.AuthenticationMethodMD5,
 		Salt:   []byte{'\xd1', '\x5b', '\x0e', '\x4f'},
 	}
 	s.Equal(expected, a.Encode())
@@ -74,7 +74,7 @@ func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_OK() {
 	a, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
 	s.Nil(err)
 	s.NotNil(a)
-	s.Equal(a.Method, pgproto.AUTHENTICATION_OK)
+	s.Equal(a.Method, pgproto.AuthenticationMethodOK)
 	s.Nil(a.Salt)
 	s.Equal(raw, a.Encode())
 }
@@ -90,7 +90,7 @@ func (s *AuthenticationRequestTestSuite) Test_AuthenticationRequestEncode_OK() {
 	}
 
 	a := &pgproto.AuthenticationRequest{
-		Method: pgproto.AUTHENTICATION_OK,
+		Method: pgproto.AuthenticationMethodOK,
 		Salt:   nil,
 	}
 	s.Equal(expected, a.Encode())
