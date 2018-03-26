@@ -92,11 +92,14 @@ func ParseMessage(r io.Reader) (Message, error) {
 			// Ready for query
 			return ParseReadyForQuery(w.Reader())
 		case 'Q':
-			// Query
-			return ParseReadyForQuery(w.Reader())
+			// Simple query
+			return ParseSimpleQuery(w.Reader())
+		case 'C':
+			// Command completion
+			return ParseCommandCompletion(w.Reader())
 		case 'E':
 			// Error message
-			return nil, nil
+			return ParseError(w.Reader())
 		case 'X':
 			// Termination
 			return ParseTermination(w.Reader())
