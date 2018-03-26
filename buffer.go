@@ -36,6 +36,19 @@ func (b *readBuffer) ReadInt() (int, error) {
 	return bytesToInt(buf), nil
 }
 
+func (b *readBuffer) ReadInt16() (int, error) {
+	buf := make([]byte, 2)
+	n, err := b.Read(buf)
+	if err != nil {
+		return 0, err
+	}
+	if n != 2 {
+		return 0, io.EOF
+	}
+
+	return bytesToInt16(buf), nil
+}
+
 func (b *readBuffer) ReadLength() (*readBuffer, error) {
 	l, err := b.ReadInt()
 	if err != nil {
@@ -131,6 +144,12 @@ func (b *writeBuffer) Bytes() []byte {
 func (b *writeBuffer) WriteInt(i int) {
 	buf := make([]byte, 4)
 	binary.BigEndian.PutUint32(buf, uint32(i))
+	b.bytes = append(b.bytes, buf...)
+}
+
+func (b *writeBuffer) WriteInt16(i int) {
+	buf := make([]byte, 2)
+	binary.BigEndian.PutUint16(buf, uint16(i))
 	b.bytes = append(b.bytes, buf...)
 }
 

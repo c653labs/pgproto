@@ -97,6 +97,12 @@ func ParseMessage(r io.Reader) (Message, error) {
 		case 'C':
 			// Command completion
 			return ParseCommandCompletion(w.Reader())
+		case 'T':
+			// Row description
+			return ParseRowDescription(w.Reader())
+		case 'D':
+			// Data row
+			return ParseDataRow(w.Reader())
 		case 'E':
 			// Error message
 			return ParseError(w.Reader())

@@ -10,6 +10,10 @@ func bytesToInt(buf []byte) int {
 	return int(int32(binary.BigEndian.Uint32(buf)))
 }
 
+func bytesToInt16(buf []byte) int {
+	return int(int16(binary.BigEndian.Uint16(buf)))
+}
+
 func hashPassword(user []byte, password []byte, salt []byte) []byte {
 	digest := md5.New()
 	digest.Write(password)
