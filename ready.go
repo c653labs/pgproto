@@ -5,8 +5,22 @@ import (
 	"io"
 )
 
+type ReadyStatus int
+
+const (
+	READY_IDLE ReadyStatus = 73
+)
+
+func (r ReadyStatus) String() string {
+	switch r {
+	case READY_IDLE:
+		return "Idle"
+	}
+	return "Unknown"
+}
+
 type ReadyForQuery struct {
-	Status int
+	Status ReadyStatus
 }
 
 func ParseReadyForQuery(r io.Reader) (*ReadyForQuery, error) {
@@ -32,7 +46,7 @@ func ParseReadyForQuery(r io.Reader) (*ReadyForQuery, error) {
 	}
 
 	return &ReadyForQuery{
-		Status: int(i),
+		Status: ReadyStatus(i),
 	}, nil
 }
 
@@ -45,4 +59,8 @@ func (r *ReadyForQuery) Encode() []byte {
 
 func (r *ReadyForQuery) WriteTo(w io.Writer) (int, error) {
 	return w.Write(r.Encode())
+}
+
+func (r *ReadyForQuery) String() string {
+	return fmt.Sprintf("ReadyForQuery<Status=%s>", r.Status)
 }

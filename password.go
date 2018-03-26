@@ -1,6 +1,8 @@
 package pgmsg
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 )
 
@@ -32,6 +34,15 @@ func ParsePasswordMessage(r io.Reader) (*PasswordMessage, error) {
 	return p, nil
 }
 
+func (p *PasswordMessage) PasswordValid(user []byte, password []byte, salt []byte) bool {
+	hash := hashPassword(user, password, salt)
+	return bytes.Equal(p.Password, hash)
+}
+
+func (p *PasswordMessage) SetPassword(user []byte, password []byte, salt []byte) {
+	p.Password = hashPassword(user, password, salt)
+}
+
 func (p *PasswordMessage) Encode() []byte {
 	// 'p' [int32 - length] [string] \0
 	w := newWriteBuffer()
@@ -42,4 +53,8 @@ func (p *PasswordMessage) Encode() []byte {
 
 func (p *PasswordMessage) WriteTo(w io.Writer) (int, error) {
 	return w.Write(p.Encode())
+}
+
+func (p *PasswordMessage) String() string {
+	return fmt.Sprintf("PasswordMessage<Password=%#v>", string(p.Password))
 }

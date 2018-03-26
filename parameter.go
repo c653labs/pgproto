@@ -1,6 +1,7 @@
 package pgmsg
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -49,4 +50,8 @@ func (p *ParameterStatus) Encode() []byte {
 
 func (p *ParameterStatus) WriteTo(w io.Writer) (int, error) {
 	return w.Write(p.Encode())
+}
+
+func (p *ParameterStatus) String() string {
+	return fmt.Sprintf("ParameterStatus<Name=%#v, Value=%#v>", string(p.Name), string(p.Value))
 }

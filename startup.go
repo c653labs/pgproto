@@ -2,6 +2,7 @@ package pgmsg
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"sort"
 )
@@ -81,4 +82,8 @@ func (s *StartupMessage) Encode() []byte {
 
 func (s *StartupMessage) WriteTo(w io.Writer) (int, error) {
 	return w.Write(s.Encode())
+}
+
+func (s *StartupMessage) String() string {
+	return fmt.Sprintf("StartupMessage<Protocol=%#v, Options=%#v>", s.Protocol, s.Options)
 }

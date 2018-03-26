@@ -1,6 +1,9 @@
 package pgmsg
 
-import "io"
+import (
+	"fmt"
+	"io"
+)
 
 type BackendKeyData struct {
 	PID int
@@ -46,4 +49,8 @@ func (b *BackendKeyData) Encode() []byte {
 
 func (b *BackendKeyData) WriteTo(w io.Writer) (int, error) {
 	return w.Write(b.Encode())
+}
+
+func (b *BackendKeyData) String() string {
+	return fmt.Sprintf("BackendKeyData<PID=%#v, Key=%#v>", b.PID, b.Key)
 }

@@ -36,3 +36,7 @@ func (t *Termination) Encode() []byte {
 func (t *Termination) WriteTo(w io.Writer) (int, error) {
 	return w.Write(t.Encode())
 }
+
+func (t *Termination) String() string {
+	return "Termination<>"
+}

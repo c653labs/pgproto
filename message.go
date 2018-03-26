@@ -8,6 +8,7 @@ import (
 type Message interface {
 	Encode() []byte
 	WriteTo(w io.Writer) (int, error)
+	String() string
 }
 
 func ParseMessage(r io.Reader) (Message, error) {
