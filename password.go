@@ -51,9 +51,7 @@ func (p *PasswordMessage) Encode() []byte {
 	return w.Bytes()
 }
 
-func (p *PasswordMessage) WriteTo(w io.Writer) (int, error) {
-	return w.Write(p.Encode())
-}
+func (p *PasswordMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
 
 func (p *PasswordMessage) String() string {
 	return fmt.Sprintf("PasswordMessage<Password=%#v>", string(p.Password))

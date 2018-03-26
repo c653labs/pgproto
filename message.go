@@ -7,7 +7,7 @@ import (
 
 type Message interface {
 	Encode() []byte
-	WriteTo(w io.Writer) (int, error)
+	WriteTo(w io.Writer) (int64, error)
 	String() string
 }
 

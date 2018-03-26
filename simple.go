@@ -43,6 +43,4 @@ func (q *SimpleQuery) String() string {
 	return fmt.Sprintf("SimpleQuery<Query=%#v>", string(q.Query))
 }
 
-func (q *SimpleQuery) WriteTo(w io.Writer) (int, error) {
-	return w.Write(q.Encode())
-}
+func (q *SimpleQuery) WriteTo(w io.Writer) (int64, error) { return writeTo(q, w) }

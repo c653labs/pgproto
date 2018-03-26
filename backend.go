@@ -47,9 +47,7 @@ func (b *BackendKeyData) Encode() []byte {
 	return buf.Bytes()
 }
 
-func (b *BackendKeyData) WriteTo(w io.Writer) (int, error) {
-	return w.Write(b.Encode())
-}
+func (b *BackendKeyData) WriteTo(w io.Writer) (int64, error) { return writeTo(b, w) }
 
 func (b *BackendKeyData) String() string {
 	return fmt.Sprintf("BackendKeyData<PID=%#v, Key=%#v>", b.PID, b.Key)

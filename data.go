@@ -60,9 +60,7 @@ func (d *DataRow) Encode() []byte {
 	return b.Bytes()
 }
 
-func (d *DataRow) WriteTo(w io.Writer) (int, error) {
-	return w.Write(d.Encode())
-}
+func (d *DataRow) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
 
 func (d *DataRow) String() string {
 	str := "DataRow<"

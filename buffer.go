@@ -157,8 +157,9 @@ func (b *writeBuffer) WriteBytes(buf []byte) {
 	b.bytes = append(b.bytes, buf...)
 }
 
-func (b *writeBuffer) WriteByte(c byte) {
+func (b *writeBuffer) WriteByte(c byte) error {
 	b.bytes = append(b.bytes, c)
+	return nil
 }
 
 func (b *writeBuffer) WriteString(buf []byte, null bool) {

@@ -39,9 +39,7 @@ func (c *CommandCompletion) Encode() []byte {
 	return b.Bytes()
 }
 
-func (c *CommandCompletion) WriteTo(w io.Writer) (int, error) {
-	return w.Write(c.Encode())
-}
+func (c *CommandCompletion) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
 
 func (c *CommandCompletion) String() string {
 	return fmt.Sprintf("CommandCompletion<Tag=%#v>", string(c.Tag))

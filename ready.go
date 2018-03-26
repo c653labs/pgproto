@@ -57,9 +57,7 @@ func (r *ReadyForQuery) Encode() []byte {
 	return b.Bytes()
 }
 
-func (r *ReadyForQuery) WriteTo(w io.Writer) (int, error) {
-	return w.Write(r.Encode())
-}
+func (r *ReadyForQuery) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
 
 func (r *ReadyForQuery) String() string {
 	return fmt.Sprintf("ReadyForQuery<Status=%s>", r.Status)

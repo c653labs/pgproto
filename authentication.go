@@ -81,9 +81,7 @@ func (a *AuthenticationRequest) Encode() []byte {
 	return w.Bytes()
 }
 
-func (a *AuthenticationRequest) WriteTo(w io.Writer) (int, error) {
-	return w.Write(a.Encode())
-}
+func (a *AuthenticationRequest) WriteTo(w io.Writer) (int64, error) { return writeTo(a, w) }
 
 func (a *AuthenticationRequest) String() string {
 	return fmt.Sprintf("AuthenticationRequest<Method=%v, Salt=%v>", a.Method, a.Salt)

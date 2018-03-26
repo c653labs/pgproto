@@ -108,9 +108,7 @@ func (e *Error) Encode() []byte {
 	return b.Bytes()
 }
 
-func (e *Error) WriteTo(w io.Writer) (int, error) {
-	return w.Write(e.Encode())
-}
+func (e *Error) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
 
 func (e *Error) String() string {
 	return fmt.Sprintf(

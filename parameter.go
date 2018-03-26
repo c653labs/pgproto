@@ -48,9 +48,7 @@ func (p *ParameterStatus) Encode() []byte {
 	return w.Bytes()
 }
 
-func (p *ParameterStatus) WriteTo(w io.Writer) (int, error) {
-	return w.Write(p.Encode())
-}
+func (p *ParameterStatus) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
 
 func (p *ParameterStatus) String() string {
 	return fmt.Sprintf("ParameterStatus<Name=%#v, Value=%#v>", string(p.Name), string(p.Value))

@@ -143,9 +143,7 @@ func (r *RowDescription) Encode() []byte {
 	return b.Bytes()
 }
 
-func (r *RowDescription) WriteTo(w io.Writer) (int, error) {
-	return w.Write(r.Encode())
-}
+func (r *RowDescription) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
 
 func (r *RowDescription) String() string {
 	str := "RowDescription<"
