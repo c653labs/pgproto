@@ -1,10 +1,10 @@
-package pgmsg_test
+package pgproto_test
 
 import (
 	"bytes"
 	"testing"
 
-	"github.com/c653labs/pgmsg"
+	"github.com/c653labs/pgproto"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -19,7 +19,7 @@ func TestStartupMessageTestSuite(t *testing.T) {
 func (s *StartupMessageTestSuite) Test_ParseStartupMessage() {
 	raw := []byte{
 		// Length
-		'\x00', '\x00', '\x00', '\x25',
+		'\x00', '\x00', '\x00', '\x27',
 		// Protocol
 		'\x00', '\x03', '\x00', '\x00',
 		// "database" \0
@@ -28,16 +28,16 @@ func (s *StartupMessageTestSuite) Test_ParseStartupMessage() {
 		'\x64', '\x62', '\x5f', '\x6e', '\x61', '\x6d', '\x65', '\x00',
 		// "user" \0
 		'\x75', '\x73', '\x65', '\x72', '\x00',
-		// "pgmsg" \0
-		'\x70', '\x67', '\x6d', '\x73', '\x67', '\x00',
+		// "pgproto" \0
+		'\x70', '\x67', '\x70', '\x72', '\x6f', '\x74', '\x6f', '\x00',
 		// ending
 		'\x00',
 	}
-	startup, err := pgmsg.ParseStartupMessage(bytes.NewReader(raw))
+	startup, err := pgproto.ParseStartupMessage(bytes.NewReader(raw))
 	s.Nil(err)
 	s.NotNil(startup)
 	s.Equal(startup.Protocol, 196608)
-	s.Equal(startup.Options["user"], []byte("pgmsg"))
+	s.Equal(startup.Options["user"], []byte("pgproto"))
 	s.Equal(startup.Options["database"], []byte("db_name"))
 	s.Equal(raw, startup.Encode())
 }
@@ -52,7 +52,7 @@ func (s *StartupMessageTestSuite) Test_ParseStartupMessage_NoOptions() {
 		'\x00',
 	}
 
-	startup, err := pgmsg.ParseStartupMessage(bytes.NewReader(raw))
+	startup, err := pgproto.ParseStartupMessage(bytes.NewReader(raw))
 	s.Nil(err)
 	s.NotNil(startup)
 	s.Equal(startup.Protocol, 196608)
@@ -62,7 +62,7 @@ func (s *StartupMessageTestSuite) Test_ParseStartupMessage_NoOptions() {
 func (s *StartupMessageTestSuite) Test_StartupMessageEncode() {
 	expected := []byte{
 		// Length
-		'\x00', '\x00', '\x00', '\x25',
+		'\x00', '\x00', '\x00', '\x27',
 		// Protocol
 		'\x00', '\x03', '\x00', '\x00',
 		// "database" \0
@@ -71,16 +71,16 @@ func (s *StartupMessageTestSuite) Test_StartupMessageEncode() {
 		'\x64', '\x62', '\x5f', '\x6e', '\x61', '\x6d', '\x65', '\x00',
 		// "user" \0
 		'\x75', '\x73', '\x65', '\x72', '\x00',
-		// "pgmsg" \0
-		'\x70', '\x67', '\x6d', '\x73', '\x67', '\x00',
+		// "pgproto" \0
+		'\x70', '\x67', '\x70', '\x72', '\x6f', '\x74', '\x6f', '\x00',
 		// ending
 		'\x00',
 	}
-	startup := &pgmsg.StartupMessage{
+	startup := &pgproto.StartupMessage{
 		Protocol: 196608,
 		Options:  make(map[string][]byte),
 	}
-	startup.Options["user"] = []byte("pgmsg")
+	startup.Options["user"] = []byte("pgproto")
 	startup.Options["database"] = []byte("db_name")
 	s.Equal(expected, startup.Encode())
 }
@@ -93,7 +93,7 @@ func (s *StartupMessageTestSuite) Test_StartupMessageEncode_NoOptions() {
 		// ending
 		'\x00',
 	}
-	startup := &pgmsg.StartupMessage{
+	startup := &pgproto.StartupMessage{
 		Protocol: 196608,
 	}
 	s.Equal(expected, startup.Encode())

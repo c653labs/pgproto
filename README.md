@@ -1,1 +1,1 @@
-# pgmsg
+# pgproto
