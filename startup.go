@@ -8,8 +8,7 @@ import (
 )
 
 type StartupMessage struct {
-	Protocol int
-	Options  map[string][]byte
+	Options map[string][]byte
 }
 
 func (s *StartupMessage) client() {}
@@ -28,9 +27,12 @@ func ParseStartupMessage(r io.Reader) (*StartupMessage, error) {
 	}
 
 	// Parse protocol version
-	s.Protocol, err = buf.ReadInt()
+	p, err := buf.ReadInt()
 	if err != nil {
 		return nil, err
+	}
+	if p != ProtocolVersion {
+		return nil, fmt.Errorf("unsupported protocol version")
 	}
 
 	// Parse the key/value pairs
@@ -62,7 +64,7 @@ func ParseStartupMessage(r io.Reader) (*StartupMessage, error) {
 
 func (s *StartupMessage) Encode() []byte {
 	w := newWriteBuffer()
-	w.WriteInt(s.Protocol)
+	w.WriteInt(ProtocolVersion)
 
 	// Encode the options in sorted order
 	keys := []string{}
@@ -85,5 +87,5 @@ func (s *StartupMessage) Encode() []byte {
 func (s *StartupMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
 
 func (s *StartupMessage) String() string {
-	return fmt.Sprintf("StartupMessage<Protocol=%#v, Options=%#v>", s.Protocol, s.Options)
+	return fmt.Sprintf("StartupMessage<Protocol=%#v, Options=%#v>", ProtocolVersion, s.Options)
 }

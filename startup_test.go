@@ -36,7 +36,6 @@ func (s *StartupMessageTestSuite) Test_ParseStartupMessage() {
 	startup, err := pgproto.ParseStartupMessage(bytes.NewReader(raw))
 	s.Nil(err)
 	s.NotNil(startup)
-	s.Equal(startup.Protocol, 196608)
 	s.Equal(startup.Options["user"], []byte("pgproto"))
 	s.Equal(startup.Options["database"], []byte("db_name"))
 	s.Equal(raw, startup.Encode())
@@ -55,8 +54,22 @@ func (s *StartupMessageTestSuite) Test_ParseStartupMessage_NoOptions() {
 	startup, err := pgproto.ParseStartupMessage(bytes.NewReader(raw))
 	s.Nil(err)
 	s.NotNil(startup)
-	s.Equal(startup.Protocol, 196608)
 	s.Equal(raw, startup.Encode())
+}
+
+func (s *StartupMessageTestSuite) Test_ParseStartupMessage_InvalidProtocolVersion() {
+	raw := []byte{
+		// Length
+		'\x00', '\x00', '\x00', '\x09',
+		// Protocol
+		'\x00', '\x00', '\x04', '\x00',
+		// ending
+		'\x00',
+	}
+
+	startup, err := pgproto.ParseStartupMessage(bytes.NewReader(raw))
+	s.NotNil(err)
+	s.Nil(startup)
 }
 
 func (s *StartupMessageTestSuite) Test_StartupMessageEncode() {
@@ -77,8 +90,7 @@ func (s *StartupMessageTestSuite) Test_StartupMessageEncode() {
 		'\x00',
 	}
 	startup := &pgproto.StartupMessage{
-		Protocol: 196608,
-		Options:  make(map[string][]byte),
+		Options: make(map[string][]byte),
 	}
 	startup.Options["user"] = []byte("pgproto")
 	startup.Options["database"] = []byte("db_name")
@@ -93,8 +105,6 @@ func (s *StartupMessageTestSuite) Test_StartupMessageEncode_NoOptions() {
 		// ending
 		'\x00',
 	}
-	startup := &pgproto.StartupMessage{
-		Protocol: 196608,
-	}
+	startup := &pgproto.StartupMessage{}
 	s.Equal(expected, startup.Encode())
 }
