@@ -10,6 +10,8 @@ type ParameterStatus struct {
 	Value []byte
 }
 
+func (p *ParameterStatus) server() {}
+
 func ParseParameterStatus(r io.Reader) (*ParameterStatus, error) {
 	b := newReadBuffer(r)
 

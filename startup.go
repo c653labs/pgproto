@@ -12,6 +12,8 @@ type StartupMessage struct {
 	Options  map[string][]byte
 }
 
+func (s *StartupMessage) client() {}
+
 func ParseStartupMessage(r io.Reader) (*StartupMessage, error) {
 	b := newReadBuffer(r)
 

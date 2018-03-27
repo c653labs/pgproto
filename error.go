@@ -17,6 +17,8 @@ type Error struct {
 	Routine  []byte
 }
 
+func (e *Error) server() {}
+
 func ParseError(r io.Reader) (*Error, error) {
 	b := newReadBuffer(r)
 

@@ -8,13 +8,16 @@ import (
 type RowFormat int
 
 const (
-	ROW_FORMAT_TEXT RowFormat = 0
+	RowFormatText   RowFormat = 0
+	RowFormatBinary RowFormat = 1
 )
 
 func (f RowFormat) String() string {
 	switch f {
-	case ROW_FORMAT_TEXT:
+	case RowFormatText:
 		return "Text"
+	case RowFormatBinary:
+		return "Binary"
 	}
 	return "Unknown"
 }
@@ -39,6 +42,8 @@ func (f RowField) String() string {
 type RowDescription struct {
 	Fields []RowField
 }
+
+func (r *RowDescription) server() {}
 
 func ParseRowDescription(r io.Reader) (*RowDescription, error) {
 	b := newReadBuffer(r)

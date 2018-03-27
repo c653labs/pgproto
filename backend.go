@@ -10,6 +10,8 @@ type BackendKeyData struct {
 	Key int
 }
 
+func (b *BackendKeyData) server() {}
+
 func ParseBackendKeyData(r io.Reader) (*BackendKeyData, error) {
 	buf := newReadBuffer(r)
 

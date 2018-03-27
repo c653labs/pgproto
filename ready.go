@@ -23,6 +23,8 @@ type ReadyForQuery struct {
 	Status ReadyStatus
 }
 
+func (r *ReadyForQuery) server() {}
+
 func ParseReadyForQuery(r io.Reader) (*ReadyForQuery, error) {
 	b := newReadBuffer(r)
 

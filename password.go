@@ -10,6 +10,8 @@ type PasswordMessage struct {
 	Password []byte
 }
 
+func (p *PasswordMessage) client() {}
+
 func ParsePasswordMessage(r io.Reader) (*PasswordMessage, error) {
 	b := newReadBuffer(r)
 

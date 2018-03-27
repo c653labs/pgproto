@@ -7,6 +7,8 @@ import (
 
 type Termination struct{}
 
+func (t *Termination) client() {}
+
 func ParseTermination(r io.Reader) (*Termination, error) {
 	b := newReadBuffer(r)
 

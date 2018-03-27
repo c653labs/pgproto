@@ -9,6 +9,8 @@ type SimpleQuery struct {
 	Query []byte
 }
 
+func (q *SimpleQuery) client() {}
+
 func ParseSimpleQuery(r io.Reader) (*SimpleQuery, error) {
 	b := newReadBuffer(r)
 

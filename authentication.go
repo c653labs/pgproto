@@ -35,6 +35,8 @@ type AuthenticationRequest struct {
 	Salt   []byte
 }
 
+func (a *AuthenticationRequest) server() {}
+
 // ParseAuthenticationRequest will attempt to read an AuthenticationRequest message from the reader
 func ParseAuthenticationRequest(r io.Reader) (*AuthenticationRequest, error) {
 	b := newReadBuffer(r)

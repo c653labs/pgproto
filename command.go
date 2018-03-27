@@ -9,6 +9,8 @@ type CommandCompletion struct {
 	Tag []byte
 }
 
+func (c *CommandCompletion) server() {}
+
 func ParseCommandCompletion(r io.Reader) (*CommandCompletion, error) {
 	b := newReadBuffer(r)
 

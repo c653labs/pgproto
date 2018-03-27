@@ -9,6 +9,8 @@ type DataRow struct {
 	Fields [][]byte
 }
 
+func (d *DataRow) server() {}
+
 func ParseDataRow(r io.Reader) (*DataRow, error) {
 	b := newReadBuffer(r)
 
