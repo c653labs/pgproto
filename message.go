@@ -110,7 +110,7 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 			return nil, nil
 		case 'H':
 			// Flush
-			return nil, nil
+			return ParseFlush(w.Reader())
 		case 'S':
 			// Sync
 			return nil, nil
