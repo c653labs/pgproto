@@ -41,61 +41,25 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 	//   [char - tag] [int32 - length] [payload] \0
 	switch start {
 	// TODO: We need to handle this case better, it might not always start with \x00
+	//       We could just make calling `ParseStartupMessage` explicit
 	case '\x00':
-		// [int32 - length] [payload]
-		// StartupMessage
-		// Read the next 3 bytes, prepend with the 1 we already read to parse the length from this message
-		b := make([]byte, 3)
-		_, err := buf.Read(b)
+		msgReader, err := readStartupMessage(start, buf)
 		if err != nil {
 			return nil, err
 		}
-		b = append([]byte{start}, b...)
-		l := bytesToInt(b)
-
-		// Read the rest of the message into a []byte
-		// DEV: Subtract 4 to account for the length of the in32 we just read
-		b = make([]byte, l-4)
-		_, err = buf.Read(b)
-		if err != nil {
-			return nil, err
-		}
-
-		// Rebuild the message into a []byte
-		w := newWriteBuffer()
-		w.WriteInt(l)
-		w.WriteBytes(b)
-
-		return ParseStartupMessage(w.Reader())
+		return ParseStartupMessage(msgReader)
 	default:
-		// [char tag] [int32 length] [payload]
-		// Parse length from the message
-		l, err := buf.ReadInt()
+		msgReader, err := readMessage(start, buf)
 		if err != nil {
 			return nil, err
 		}
-
-		// Read the rest of the message into a []byte
-		// DEV: Subtract 4 to account for the length of the int32 we just read
-		b := make([]byte, l-4)
-		_, err = buf.Read(b)
-		if err != nil {
-			return nil, err
-		}
-
-		// Rebuild the message into a []byte
-		w := newWriteBuffer()
-		w.WriteByte(start)
-		w.WriteInt(l)
-		w.WriteBytes(b)
-
 		switch start {
 		case 'p':
 			// Password message
-			return ParsePasswordMessage(w.Reader())
+			return ParsePasswordMessage(msgReader)
 		case 'Q':
 			// Simple query
-			return ParseSimpleQuery(w.Reader())
+			return ParseSimpleQuery(msgReader)
 		case 't':
 			// Parameter description
 			return nil, nil
@@ -110,19 +74,19 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 			return nil, nil
 		case 'H':
 			// Flush
-			return ParseFlush(w.Reader())
+			return ParseFlush(msgReader)
 		case 'S':
 			// Sync
-			return ParseSync(w.Reader())
+			return ParseSync(msgReader)
 		case 'C':
 			// Close
-			return ParseClose(w.Reader())
+			return ParseClose(msgReader)
 		case 'D':
 			// Describe
 			return nil, nil
 		case 'X':
 			// Termination
-			return ParseTermination(w.Reader())
+			return ParseTermination(msgReader)
 		default:
 			return nil, fmt.Errorf("unknown message tag '%c'", start)
 		}
@@ -140,54 +104,41 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return nil, err
 	}
 
-	// [char tag] [int32 length] [payload]
-	// Parse length from the message
-	l, err := buf.ReadInt()
+	msgReader, err := readMessage(start, buf)
 	if err != nil {
 		return nil, err
 	}
 
-	// Read the rest of the message into a []byte
-	// DEV: Subtract 4 to account for the length of the int32 we just read
-	b := make([]byte, l-4)
-	_, err = buf.Read(b)
-	if err != nil {
-		return nil, err
-	}
-
-	// Rebuild the message into a []byte
-	w := newWriteBuffer()
-	w.WriteByte(start)
-	w.WriteInt(l)
-	w.WriteBytes(b)
+	// Regular message
+	//   [char - tag] [int32 - length] [payload] \0
 	switch start {
 	case 'R':
 		// Authentication request
-		return ParseAuthenticationRequest(w.Reader())
+		return ParseAuthenticationRequest(msgReader)
 	case 'S':
 		// Parameter status
-		return ParseParameterStatus(w.Reader())
+		return ParseParameterStatus(msgReader)
 	case 'K':
 		// Backend key data
-		return ParseBackendKeyData(w.Reader())
+		return ParseBackendKeyData(msgReader)
 	case 'Z':
 		// Ready for query
-		return ParseReadyForQuery(w.Reader())
+		return ParseReadyForQuery(msgReader)
 	case 'C':
 		// Command completion
-		return ParseCommandCompletion(w.Reader())
+		return ParseCommandCompletion(msgReader)
 	case 'T':
 		// Row description
-		return ParseRowDescription(w.Reader())
+		return ParseRowDescription(msgReader)
 	case 't':
 		// Parameter description
 		return nil, nil
 	case 'D':
 		// Data row
-		return ParseDataRow(w.Reader())
+		return ParseDataRow(msgReader)
 	case 'I':
 		// Empty query response
-		return ParseEmptyQueryResponse(w.Reader())
+		return ParseEmptyQueryResponse(msgReader)
 	case 'B':
 		// Bind
 		return nil, nil
@@ -226,8 +177,59 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return nil, nil
 	case 'E':
 		// Error message
-		return ParseError(w.Reader())
+		return ParseError(msgReader)
 	default:
 		return nil, fmt.Errorf("unknown message tag '%c'", start)
 	}
+}
+
+func readStartupMessage(start byte, buf *readBuffer) (io.Reader, error) {
+	// [int32 - length] [payload]
+	// StartupMessage
+	// Read the next 3 bytes, prepend with the 1 we already read to parse the length from this message
+	b := make([]byte, 3)
+	_, err := buf.Read(b)
+	if err != nil {
+		return nil, err
+	}
+	b = append([]byte{start}, b...)
+	l := bytesToInt(b)
+
+	// Read the rest of the message into a []byte
+	// DEV: Subtract 4 to account for the length of the in32 we just read
+	b = make([]byte, l-4)
+	_, err = buf.Read(b)
+	if err != nil {
+		return nil, err
+	}
+
+	// Rebuild the message into a []byte
+	w := newWriteBuffer()
+	w.WriteInt(l)
+	w.WriteBytes(b)
+	return w.Reader(), nil
+}
+
+func readMessage(start byte, buf *readBuffer) (io.Reader, error) {
+	// [char tag] [int32 length] [payload]
+	// Parse length from the message
+	l, err := buf.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+
+	// Read the rest of the message into a []byte
+	// DEV: Subtract 4 to account for the length of the int32 we just read
+	b := make([]byte, l-4)
+	_, err = buf.Read(b)
+	if err != nil {
+		return nil, err
+	}
+
+	// Rebuild the message into a []byte
+	w := newWriteBuffer()
+	w.WriteByte(start)
+	w.WriteInt(l)
+	w.WriteBytes(b)
+	return w.Reader(), nil
 }
