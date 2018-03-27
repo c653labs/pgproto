@@ -116,7 +116,7 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 			return nil, nil
 		case 'C':
 			// Close
-			return nil, nil
+			return ParseClose(w.Reader())
 		case 'D':
 			// Describe
 			return nil, nil

@@ -7,6 +7,20 @@ import (
 	"io"
 )
 
+type nullStrip bool
+
+const (
+	stripNull     nullStrip = true
+	dontStripNull           = false
+)
+
+type nullWrite bool
+
+const (
+	writeNull     nullWrite = true
+	dontWriteNull           = false
+)
+
 type readBuffer struct {
 	io.Reader
 }
@@ -105,7 +119,7 @@ func (b *readBuffer) ReadUntil(c byte) ([]byte, error) {
 	return buf, nil
 }
 
-func (b *readBuffer) ReadString(trimNull bool) ([]byte, error) {
+func (b *readBuffer) ReadString(trimNull nullStrip) ([]byte, error) {
 	str, err := b.ReadUntil('\x00')
 	if err != nil && err != io.EOF {
 		return nil, err
@@ -162,7 +176,7 @@ func (b *writeBuffer) WriteByte(c byte) error {
 	return nil
 }
 
-func (b *writeBuffer) WriteString(buf []byte, null bool) {
+func (b *writeBuffer) WriteString(buf []byte, null nullWrite) {
 	b.bytes = append(b.bytes, buf...)
 	if null {
 		b.bytes = append(b.bytes, '\x00')
