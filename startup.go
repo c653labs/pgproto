@@ -7,8 +7,13 @@ import (
 	"sort"
 )
 
+const (
+	sslRequestVersion = 80877103
+)
+
 type StartupMessage struct {
-	Options map[string][]byte
+	SSLRequest bool
+	Options    map[string][]byte
 }
 
 func (s *StartupMessage) client() {}
@@ -23,7 +28,8 @@ func ParseStartupMessage(r io.Reader) (*StartupMessage, error) {
 	}
 
 	s := &StartupMessage{
-		Options: make(map[string][]byte),
+		Options:    make(map[string][]byte),
+		SSLRequest: false,
 	}
 
 	// Parse protocol version
@@ -31,7 +37,13 @@ func ParseStartupMessage(r io.Reader) (*StartupMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	if p != ProtocolVersion {
+
+	// Protocol version should either be protocol version 3.0 or an SSL request version
+	if p == sslRequestVersion {
+		s.SSLRequest = true
+		// Exit early, we don't have any options
+		return s, nil
+	} else if p != ProtocolVersion {
 		return nil, fmt.Errorf("unsupported protocol version")
 	}
 
@@ -87,7 +99,13 @@ func (s *StartupMessage) Encode() []byte {
 func (s *StartupMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
 
 func (s *StartupMessage) String() string {
-	str := fmt.Sprintf("StartupMessage<Protocol=%#v, Options<", ProtocolVersion)
+	str := fmt.Sprintf("StartupMessage<")
+	if s.SSLRequest {
+		str += "SSLRequest"
+	} else {
+		str += fmt.Sprintf("Protocol=%#v", ProtocolVersion)
+	}
+	str += fmt.Sprintf(", Options<")
 
 	keys := make([]string, 0)
 	for k, _ := range s.Options {
