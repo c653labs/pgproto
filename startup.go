@@ -87,5 +87,18 @@ func (s *StartupMessage) Encode() []byte {
 func (s *StartupMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
 
 func (s *StartupMessage) String() string {
-	return fmt.Sprintf("StartupMessage<Protocol=%#v, Options=%#v>", ProtocolVersion, s.Options)
+	str := fmt.Sprintf("StartupMessage<Protocol=%#v, Options<", ProtocolVersion)
+
+	keys := make([]string, 0)
+	for k, _ := range s.Options {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for i, k := range keys {
+		if i > 0 {
+			str += ", "
+		}
+		str += fmt.Sprintf("%s=%#v", k, string(s.Options[k]))
+	}
+	return str + ">>"
 }
