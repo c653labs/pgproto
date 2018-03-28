@@ -64,13 +64,15 @@ func ParseAuthenticationRequest(r io.Reader) (*AuthenticationRequest, error) {
 
 	a := &AuthenticationRequest{
 		Method: m,
-		Salt:   nil,
 	}
 
 	if a.Method == AuthenticationMethodMD5 {
 		a.Salt, err = buf.ReadString(false)
 		if err != nil {
 			return nil, err
+		}
+		if len(a.Salt) != 4 {
+			return nil, fmt.Errorf("expected salt of length 4")
 		}
 	}
 
