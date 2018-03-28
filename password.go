@@ -37,12 +37,12 @@ func ParsePasswordMessage(r io.Reader) (*PasswordMessage, error) {
 }
 
 func (p *PasswordMessage) PasswordValid(user []byte, password []byte, salt []byte) bool {
-	hash := hashPassword(user, password, salt)
+	hash := HashPassword(user, password, salt)
 	return bytes.Equal(p.Password, hash)
 }
 
 func (p *PasswordMessage) SetPassword(user []byte, password []byte, salt []byte) {
-	p.Password = hashPassword(user, password, salt)
+	p.Password = HashPassword(user, password, salt)
 }
 
 func (p *PasswordMessage) Encode() []byte {
