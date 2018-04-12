@@ -5,10 +5,7 @@ import (
 	"io"
 )
 
-type NoData struct {
-	PID       int
-	Condition []byte
-}
+type NoData struct{}
 
 func (n *NoData) server() {}
 
