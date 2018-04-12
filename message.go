@@ -139,15 +139,15 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 	case 'I':
 		// Empty query response
 		return ParseEmptyQueryResponse(msgReader)
-	case 'B':
-		// Bind
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+	case '1':
+		// Parse complete
+		return ParseParseComplete(msgReader)
 	case '2':
 		// Bind complete
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseBindComplete(msgReader)
 	case '3':
 		// Close complete
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseCloseComplete(msgReader)
 	case 'W':
 		// Copy both response
 		return nil, fmt.Errorf("unhandled message tag %#v", start)
@@ -172,9 +172,6 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 	case 'A':
 		// Notification response
 		return ParseNotification(msgReader)
-	case 'P':
-		// Parse complete
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'E':
 		// Error message
 		return ParseError(msgReader)
