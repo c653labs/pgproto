@@ -38,7 +38,7 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 	// Startup message:
 	//   [int32 - length] [int32 - protocol] [[string]\0[string]\0] \0
 	// Regular message
-	//   [char - tag] [int32 - length] [payload] \0
+	//   [char - tag] [int32 - length] [payload]
 	switch start {
 	// TODO: We need to handle this case better, it might not always start with \x00
 	//       We could just make calling `ParseStartupMessage` explicit
@@ -62,16 +62,16 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 			return ParseSimpleQuery(msgReader)
 		case 't':
 			// Parameter description
-			return nil, nil
+			return ParseParameterDescription(msgReader)
 		case 'B':
 			// Binary parameters
-			return nil, nil
+			return ParseBinaryParameters(msgReader)
 		case 'P':
 			// Parse
-			return nil, nil
+			return ParseParse(msgReader)
 		case 'E':
 			// Execute
-			return nil, nil
+			return ParseExecute(msgReader)
 		case 'H':
 			// Flush
 			return ParseFlush(msgReader)
@@ -83,7 +83,7 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 			return ParseClose(msgReader)
 		case 'D':
 			// Describe
-			return nil, nil
+			return ParseDescribe(msgReader)
 		case 'X':
 			// Termination
 			return ParseTermination(msgReader)
@@ -109,8 +109,8 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return nil, err
 	}
 
-	// Regular message
-	//   [char - tag] [int32 - length] [payload] \0
+	// Message
+	//   [char - tag] [int32 - length] [payload]
 	switch start {
 	case 'R':
 		// Authentication request
@@ -132,7 +132,7 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return ParseRowDescription(msgReader)
 	case 't':
 		// Parameter description
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'D':
 		// Data row
 		return ParseDataRow(msgReader)
@@ -141,40 +141,40 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return ParseEmptyQueryResponse(msgReader)
 	case 'B':
 		// Bind
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case '2':
 		// Bind complete
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case '3':
 		// Close complete
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'W':
 		// Copy both response
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'd':
 		// Copy data
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'G':
 		// Copy in response
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'H':
 		// Copy out response
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'V':
 		// Function call response
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'n':
 		// No data
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'N':
 		// Notice response
-		return nil, nil
+		return ParseNoticeResponse(msgReader)
 	case 'A':
 		// Notification response
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'P':
 		// Parse complete
-		return nil, nil
+		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'E':
 		// Error message
 		return ParseError(msgReader)

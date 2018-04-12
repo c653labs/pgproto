@@ -22,10 +22,14 @@ func (e *Error) server() {}
 func ParseError(r io.Reader) (*Error, error) {
 	b := newReadBuffer(r)
 
-	// 'E' [int32 - length] ([char - key] [string - value] \0)+ \0
-	err := b.ReadTag('E')
+	// 'E'|'N' [int32 - length] ([char - key] [string - value] \0)+ \0
+	tag, err := b.ReadByte()
 	if err != nil {
 		return nil, err
+	}
+
+	if tag != 'E' && tag != 'N' {
+		return nil, fmt.Errorf("expected tag 'E' or 'N'")
 	}
 
 	b, err = b.ReadLength()
@@ -74,6 +78,16 @@ func ParseError(r io.Reader) (*Error, error) {
 }
 
 func (e *Error) Encode() []byte {
+	return encodeError(e, 'E')
+}
+
+func (e *Error) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
+
+func (e *Error) String() string {
+	return errorString(e, "Error")
+}
+
+func encodeError(e *Error, tag byte) []byte {
 	b := newWriteBuffer()
 
 	// Severity
@@ -106,15 +120,14 @@ func (e *Error) Encode() []byte {
 
 	// Finalize
 	b.WriteByte('\x00')
-	b.Wrap('E')
+	b.Wrap(tag)
 	return b.Bytes()
 }
 
-func (e *Error) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
-
-func (e *Error) String() string {
+func errorString(e *Error, name string) string {
 	return fmt.Sprintf(
-		"Error<Severity=%#v, Text=%#v, Code=%#v, Message=%#v, Position=%#v, Line=%#v, Routine=%#v>",
+		"%s<Severity=%#v, Text=%#v, Code=%#v, Message=%#v, Position=%#v, Line=%#v, Routine=%#v>",
+		name,
 		string(e.Severity),
 		string(e.Text),
 		string(e.Code),

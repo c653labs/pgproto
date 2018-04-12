@@ -5,13 +5,13 @@ import (
 	"io"
 )
 
-type DataRow struct {
+type BinaryParameters struct {
 	Fields [][]byte
 }
 
-func (d *DataRow) server() {}
+func (p *BinaryParameters) client() {}
 
-func ParseDataRow(r io.Reader) (*DataRow, error) {
+func ParseBinaryParameters(r io.Reader) (*BinaryParameters, error) {
 	b := newReadBuffer(r)
 
 	// 'D' [int32 - length] [int16 - field count] ([int32 - length] [string - data])+
@@ -31,7 +31,7 @@ func ParseDataRow(r io.Reader) (*DataRow, error) {
 		return nil, err
 	}
 
-	d := &DataRow{
+	p := &BinaryParameters{
 		Fields: make([][]byte, c),
 	}
 
@@ -45,23 +45,23 @@ func ParseDataRow(r io.Reader) (*DataRow, error) {
 		}
 
 		if l == -1 {
-			d.Fields[i] = nil
+			p.Fields[i] = nil
 		} else {
-			d.Fields[i] = make([]byte, l)
-			_, err = b.Read(d.Fields[i])
+			p.Fields[i] = make([]byte, l)
+			_, err = b.Read(p.Fields[i])
 			if err != nil {
 				return nil, err
 			}
 		}
 	}
 
-	return d, nil
+	return p, nil
 }
 
-func (d *DataRow) Encode() []byte {
+func (p *BinaryParameters) Encode() []byte {
 	b := newWriteBuffer()
-	b.WriteInt16(len(d.Fields))
-	for _, f := range d.Fields {
+	b.WriteInt16(len(p.Fields))
+	for _, f := range p.Fields {
 		b.WriteInt(len(f))
 		b.WriteBytes(f)
 	}
@@ -69,11 +69,11 @@ func (d *DataRow) Encode() []byte {
 	return b.Bytes()
 }
 
-func (d *DataRow) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
+func (p *BinaryParameters) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
 
-func (d *DataRow) String() string {
-	str := "DataRow<"
-	for i, f := range d.Fields {
+func (p *BinaryParameters) String() string {
+	str := "BinaryParameters<"
+	for i, f := range p.Fields {
 		if i > 0 {
 			str += ", "
 		}
