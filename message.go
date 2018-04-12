@@ -165,13 +165,13 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return nil, fmt.Errorf("unhandled message tag %#v", start)
 	case 'n':
 		// No data
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseNoData(msgReader)
 	case 'N':
 		// Notice response
 		return ParseNoticeResponse(msgReader)
 	case 'A':
 		// Notification response
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseNotification(msgReader)
 	case 'P':
 		// Parse complete
 		return nil, fmt.Errorf("unhandled message tag %#v", start)
