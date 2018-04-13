@@ -25,6 +25,7 @@ func ParseCloseComplete(r io.Reader) (*CloseComplete, error) {
 	return &CloseComplete{}, nil
 }
 
+// Encode will return the byte representation of this message
 func (c *CloseComplete) Encode() []byte {
 	// '3' [int32 - length]
 	buf := newWriteBuffer()
@@ -32,6 +33,13 @@ func (c *CloseComplete) Encode() []byte {
 	return buf.Bytes()
 }
 
+// AsMap method returns a common map representation of this message:
+//
+//   map[string]interface{}{
+//     "Type": "CloseComplete",
+//     "Payload": nil,
+//     },
+//   }
 func (c *CloseComplete) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type":    "CloseComplete",

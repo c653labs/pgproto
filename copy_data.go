@@ -36,6 +36,7 @@ func ParseCopyData(r io.Reader) (*CopyData, error) {
 	return c, err
 }
 
+// Encode will return the byte representation of this message
 func (c *CopyData) Encode() []byte {
 	// 'd' [int32 - length] [bytes - data]
 	w := newWriteBuffer()

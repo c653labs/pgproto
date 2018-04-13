@@ -4,12 +4,14 @@ import (
 	"io"
 )
 
+// BinaryParameters represents a client message for sending binary parameters to the server
 type BinaryParameters struct {
 	Fields [][]byte
 }
 
 func (p *BinaryParameters) client() {}
 
+// ParseBinaryParameters will attempt to read an BinaryParameter message from the io.Reader
 func ParseBinaryParameters(r io.Reader) (*BinaryParameters, error) {
 	b := newReadBuffer(r)
 
@@ -57,6 +59,7 @@ func ParseBinaryParameters(r io.Reader) (*BinaryParameters, error) {
 	return p, nil
 }
 
+// Encode will return the byte representation of this message
 func (p *BinaryParameters) Encode() []byte {
 	b := newWriteBuffer()
 	b.WriteInt16(len(p.Fields))
@@ -68,6 +71,14 @@ func (p *BinaryParameters) Encode() []byte {
 	return b.Bytes()
 }
 
+// AsMap method returns a common map representation of this message:
+//
+//   map[string]interface{}{
+//     "Type": "BinaryParameters",
+//     "Payload": map[string]interface{}{
+//       "Fields": <BinaryParameters.Fields>,
+//     },
+//   }
 func (p *BinaryParameters) AsMap() map[string]interface{} {
 	f := make([]string, len(p.Fields))
 	for k, v := range p.Fields {

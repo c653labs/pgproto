@@ -32,6 +32,13 @@ func (p *ParseComplete) Encode() []byte {
 	return buf.Bytes()
 }
 
+// AsMap method returns a common map representation of this message:
+//
+//   map[string]interface{}{
+//     "Type": "ParseComplete",
+//     "Payload": nil,
+//     },
+//   }
 func (p *ParseComplete) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type":    "ParseComplete",

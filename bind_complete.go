@@ -4,10 +4,12 @@ import (
 	"io"
 )
 
+// BindComplete represents a server response message
 type BindComplete struct{}
 
 func (b *BindComplete) server() {}
 
+// ParseBindComplete will attempt to read an BindComplete message from the io.Reader
 func ParseBindComplete(r io.Reader) (*BindComplete, error) {
 	buf := newReadBuffer(r)
 
@@ -25,6 +27,7 @@ func ParseBindComplete(r io.Reader) (*BindComplete, error) {
 	return &BindComplete{}, nil
 }
 
+// Encode will return the byte representation of this message
 func (b *BindComplete) Encode() []byte {
 	// '2' [int32 - length]
 	buf := newWriteBuffer()
@@ -32,6 +35,13 @@ func (b *BindComplete) Encode() []byte {
 	return buf.Bytes()
 }
 
+// AsMap method returns a common map representation of this message:
+//
+//   map[string]interface{}{
+//     "Type": "BindComplete",
+//     "Payload": nil,
+//     },
+//   }
 func (b *BindComplete) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type":    "BindComplete",

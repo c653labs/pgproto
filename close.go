@@ -50,6 +50,7 @@ func ParseClose(r io.Reader) (*Close, error) {
 	return c, nil
 }
 
+// Encode will return the byte representation of this message
 func (c *Close) Encode() []byte {
 	b := newWriteBuffer()
 	b.WriteByte(byte(c.ObjectType))
@@ -58,6 +59,15 @@ func (c *Close) Encode() []byte {
 	return b.Bytes()
 }
 
+// AsMap method returns a common map representation of this message:
+//
+//   map[string]interface{}{
+//     "Type": "Close",
+//     "Payload": map[string]interface{}{
+//       "ObjectType": <Close.ObjectType>,
+//       "Name": <Close.Name>,
+//     },
+//   }
 func (c *Close) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type": "Close",

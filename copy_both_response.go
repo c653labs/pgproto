@@ -47,6 +47,7 @@ func ParseCopyBothResponse(r io.Reader) (*CopyBothResponse, error) {
 	return c, nil
 }
 
+// Encode will return the byte representation of this message
 func (c *CopyBothResponse) Encode() []byte {
 	// 'W' [int32 - length] [int16 - count] [int16 - format] ...
 	w := newWriteBuffer()

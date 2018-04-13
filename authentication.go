@@ -91,6 +91,15 @@ func (a *AuthenticationRequest) Encode() []byte {
 	return w.Bytes()
 }
 
+// AsMap method returns a common map representation of this message:
+//
+//   map[string]interface{}{
+//     "Type": "AuthenticationRequest",
+//     "Payload": map[string]interface{}{
+//       "Method": <AuthenticationRequest.Method>,
+//       "Salt": <AuthenticationRequest.Salt>,
+//     },
+//   }
 func (a *AuthenticationRequest) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type": "AuthenticationRequest",

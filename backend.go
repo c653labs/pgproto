@@ -4,6 +4,7 @@ import (
 	"io"
 )
 
+// BackendKeyData is a server response message
 type BackendKeyData struct {
 	PID int
 	Key int
@@ -11,6 +12,7 @@ type BackendKeyData struct {
 
 func (b *BackendKeyData) server() {}
 
+// ParseBackendKeyData is used to parse a BackendKeyData message from an io.Reader
 func ParseBackendKeyData(r io.Reader) (*BackendKeyData, error) {
 	buf := newReadBuffer(r)
 
@@ -40,6 +42,7 @@ func ParseBackendKeyData(r io.Reader) (*BackendKeyData, error) {
 	}, nil
 }
 
+// Encode will return the byte representation of this message
 func (b *BackendKeyData) Encode() []byte {
 	buf := newWriteBuffer()
 	buf.WriteInt(b.PID)
@@ -48,6 +51,15 @@ func (b *BackendKeyData) Encode() []byte {
 	return buf.Bytes()
 }
 
+// AsMap method returns a common map representation of this message:
+//
+//   map[string]interface{}{
+//     "Type": "BackendKeyData",
+//     "Payload": map[string]interface{}{
+//       "PID": <BackendKeyData.PID>,
+//       "Key": <BackendKeyData.Key>,
+//     },
+//   }
 func (b *BackendKeyData) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type": "BackendKeyData",
