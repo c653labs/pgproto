@@ -58,5 +58,4 @@ func (b *BackendKeyData) AsMap() map[string]interface{} {
 	}
 }
 
-func (b *BackendKeyData) WriteTo(w io.Writer) (int64, error) { return writeTo(b, w) }
-func (b *BackendKeyData) String() string                     { return messageToString(b) }
+func (b *BackendKeyData) String() string { return messageToString(b) }

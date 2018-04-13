@@ -49,5 +49,4 @@ func (c *CommandCompletion) AsMap() map[string]interface{} {
 	}
 }
 
-func (c *CommandCompletion) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-func (c *CommandCompletion) String() string                     { return messageToString(c) }
+func (c *CommandCompletion) String() string { return messageToString(c) }

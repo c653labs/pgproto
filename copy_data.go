@@ -53,5 +53,4 @@ func (c *CopyData) AsMap() map[string]interface{} {
 	}
 }
 
-func (c *CopyData) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-func (c *CopyData) String() string                     { return messageToString(c) }
+func (c *CopyData) String() string { return messageToString(c) }

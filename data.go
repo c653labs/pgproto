@@ -81,5 +81,4 @@ func (d *DataRow) AsMap() map[string]interface{} {
 	}
 }
 
-func (d *DataRow) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
-func (d *DataRow) String() string                     { return messageToString(d) }
+func (d *DataRow) String() string { return messageToString(d) }

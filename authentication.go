@@ -101,6 +101,4 @@ func (a *AuthenticationRequest) AsMap() map[string]interface{} {
 	}
 }
 
-// WriteTo will write the byte representation of this AuthenticationRequest to the provided writer
-func (a *AuthenticationRequest) WriteTo(w io.Writer) (int64, error) { return writeTo(a, w) }
-func (a *AuthenticationRequest) String() string                     { return messageToString(a) }
+func (a *AuthenticationRequest) String() string { return messageToString(a) }

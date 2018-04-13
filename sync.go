@@ -42,5 +42,4 @@ func (s *Sync) AsMap() map[string]interface{} {
 	}
 }
 
-func (s *Sync) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
-func (s *Sync) String() string                     { return messageToString(s) }
+func (s *Sync) String() string { return messageToString(s) }

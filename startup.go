@@ -107,5 +107,4 @@ func (s *StartupMessage) AsMap() map[string]interface{} {
 	}
 }
 
-func (s *StartupMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
-func (s *StartupMessage) String() string                     { return messageToString(s) }
+func (s *StartupMessage) String() string { return messageToString(s) }

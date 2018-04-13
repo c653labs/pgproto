@@ -59,5 +59,4 @@ func (e *Execute) AsMap() map[string]interface{} {
 	}
 }
 
-func (e *Execute) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
-func (e *Execute) String() string                     { return messageToString(e) }
+func (e *Execute) String() string { return messageToString(e) }

@@ -148,5 +148,4 @@ func (r *RowDescription) AsMap() map[string]interface{} {
 	}
 }
 
-func (r *RowDescription) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
-func (r *RowDescription) String() string                     { return messageToString(r) }
+func (r *RowDescription) String() string { return messageToString(r) }

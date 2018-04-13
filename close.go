@@ -68,5 +68,4 @@ func (c *Close) AsMap() map[string]interface{} {
 	}
 }
 
-func (c *Close) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-func (c *Close) String() string                     { return messageToString(c) }
+func (c *Close) String() string { return messageToString(c) }

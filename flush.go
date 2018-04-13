@@ -43,5 +43,4 @@ func (f *Flush) AsMap() map[string]interface{} {
 	}
 }
 
-func (f *Flush) WriteTo(w io.Writer) (int64, error) { return writeTo(f, w) }
-func (f *Flush) String() string                     { return messageToString(f) }
+func (f *Flush) String() string { return messageToString(f) }

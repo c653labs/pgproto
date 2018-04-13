@@ -69,5 +69,4 @@ func (n *Notification) AsMap() map[string]interface{} {
 	}
 }
 
-func (n *Notification) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
-func (n *Notification) String() string                     { return messageToString(n) }
+func (n *Notification) String() string { return messageToString(n) }

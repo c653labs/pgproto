@@ -35,7 +35,7 @@ func HashPassword(user []byte, password []byte, salt []byte) []byte {
 	return append([]byte("md5"), dst...)
 }
 
-func writeTo(m Message, w io.Writer) (int64, error) {
+func WriteTo(m Message, w io.Writer) (int64, error) {
 	n, err := w.Write(m.Encode())
 	return int64(n), err
 }

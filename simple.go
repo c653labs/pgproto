@@ -49,5 +49,4 @@ func (q *SimpleQuery) AsMap() map[string]interface{} {
 	}
 }
 
-func (q *SimpleQuery) String() string                     { return messageToString(q) }
-func (q *SimpleQuery) WriteTo(w io.Writer) (int64, error) { return writeTo(q, w) }
+func (q *SimpleQuery) String() string { return messageToString(q) }

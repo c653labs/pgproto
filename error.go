@@ -81,9 +81,8 @@ func (e *Error) Encode() []byte {
 	return encodeError(e, 'E')
 }
 
-func (e *Error) AsMap() map[string]interface{}      { return errorMap(e, "Error") }
-func (e *Error) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
-func (e *Error) String() string                     { return messageToString(e) }
+func (e *Error) AsMap() map[string]interface{} { return errorMap(e, "Error") }
+func (e *Error) String() string                { return messageToString(e) }
 
 func encodeError(e *Error, tag byte) []byte {
 	b := newWriteBuffer()

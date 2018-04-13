@@ -78,5 +78,4 @@ func (p *Parse) AsMap() map[string]interface{} {
 	}
 }
 
-func (p *Parse) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-func (p *Parse) String() string                     { return messageToString(p) }
+func (p *Parse) String() string { return messageToString(p) }

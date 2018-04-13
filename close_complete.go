@@ -39,5 +39,4 @@ func (c *CloseComplete) AsMap() map[string]interface{} {
 	}
 }
 
-func (c *CloseComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-func (c *CloseComplete) String() string                     { return messageToString(c) }
+func (c *CloseComplete) String() string { return messageToString(c) }

@@ -60,5 +60,4 @@ func (p *PasswordMessage) AsMap() map[string]interface{} {
 		},
 	}
 }
-func (p *PasswordMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-func (p *PasswordMessage) String() string                     { return messageToString(p) }
+func (p *PasswordMessage) String() string { return messageToString(p) }

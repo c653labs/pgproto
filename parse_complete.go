@@ -39,5 +39,4 @@ func (p *ParseComplete) AsMap() map[string]interface{} {
 	}
 }
 
-func (p *ParseComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-func (p *ParseComplete) String() string                     { return messageToString(p) }
+func (p *ParseComplete) String() string { return messageToString(p) }

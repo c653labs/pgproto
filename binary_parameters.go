@@ -81,5 +81,4 @@ func (p *BinaryParameters) AsMap() map[string]interface{} {
 	}
 }
 
-func (p *BinaryParameters) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-func (p *BinaryParameters) String() string                     { return messageToString(p) }
+func (p *BinaryParameters) String() string { return messageToString(p) }

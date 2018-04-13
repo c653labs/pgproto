@@ -69,5 +69,4 @@ func (c *CopyOutResponse) AsMap() map[string]interface{} {
 	}
 }
 
-func (c *CopyOutResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-func (c *CopyOutResponse) String() string                     { return messageToString(c) }
+func (c *CopyOutResponse) String() string { return messageToString(c) }

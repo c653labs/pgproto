@@ -22,5 +22,4 @@ func (n *NoticeResponse) Encode() []byte {
 func (n *NoticeResponse) AsMap() map[string]interface{} {
 	return errorMap((*Error)(n), "NoticeResponse")
 }
-func (n *NoticeResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
-func (n *NoticeResponse) String() string                     { return messageToString(n) }
+func (n *NoticeResponse) String() string { return messageToString(n) }

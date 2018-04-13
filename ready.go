@@ -68,5 +68,4 @@ func (r *ReadyForQuery) AsMap() map[string]interface{} {
 	}
 }
 
-func (r *ReadyForQuery) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
-func (r *ReadyForQuery) String() string                     { return messageToString(r) }
+func (r *ReadyForQuery) String() string { return messageToString(r) }

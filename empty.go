@@ -42,5 +42,4 @@ func (e *EmptyQueryResponse) AsMap() map[string]interface{} {
 	}
 }
 
-func (e *EmptyQueryResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
-func (e *EmptyQueryResponse) String() string                     { return messageToString(e) }
+func (e *EmptyQueryResponse) String() string { return messageToString(e) }

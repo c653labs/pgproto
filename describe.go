@@ -84,5 +84,4 @@ func (d *Describe) AsMap() map[string]interface{} {
 	}
 }
 
-func (d *Describe) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
-func (d *Describe) String() string                     { return messageToString(d) }
+func (d *Describe) String() string { return messageToString(d) }

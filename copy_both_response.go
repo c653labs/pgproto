@@ -69,5 +69,4 @@ func (c *CopyBothResponse) AsMap() map[string]interface{} {
 	}
 }
 
-func (c *CopyBothResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-func (c *CopyBothResponse) String() string                     { return messageToString(c) }
+func (c *CopyBothResponse) String() string { return messageToString(c) }

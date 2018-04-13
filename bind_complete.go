@@ -39,5 +39,4 @@ func (b *BindComplete) AsMap() map[string]interface{} {
 	}
 }
 
-func (b *BindComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(b, w) }
-func (b *BindComplete) String() string                     { return messageToString(b) }
+func (b *BindComplete) String() string { return messageToString(b) }

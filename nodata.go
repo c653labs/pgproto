@@ -39,5 +39,4 @@ func (n *NoData) AsMap() map[string]interface{} {
 	}
 }
 
-func (n *NoData) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
-func (n *NoData) String() string                     { return messageToString(n) }
+func (n *NoData) String() string { return messageToString(n) }

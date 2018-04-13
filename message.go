@@ -9,7 +9,6 @@ import (
 type Message interface {
 	Encode() []byte
 	AsMap() map[string]interface{}
-	WriteTo(w io.Writer) (int64, error)
 	String() string
 }
 
