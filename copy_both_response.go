@@ -4,10 +4,8 @@ import (
 	"io"
 )
 
-type CopyBothFormat byte
-
 type CopyBothResponse struct {
-	Format        CopyBothFormat
+	Format        Format
 	ColumnFormats []int
 }
 
@@ -35,7 +33,7 @@ func ParseCopyBothResponse(r io.Reader) (*CopyBothResponse, error) {
 	}
 
 	c := &CopyBothResponse{
-		Format:        CopyBothFormat(format),
+		Format:        Format(format),
 		ColumnFormats: make([]int, count),
 	}
 
@@ -65,7 +63,7 @@ func (c *CopyBothResponse) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type": "CopyBothResponse",
 		"Payload": map[string]interface{}{
-			"Format":        byte(c.Format),
+			"Format":        c.Format,
 			"ColumnFormats": c.ColumnFormats,
 		},
 	}

@@ -4,10 +4,8 @@ import (
 	"io"
 )
 
-type CopyOutFormat byte
-
 type CopyOutResponse struct {
-	Format        CopyOutFormat
+	Format        Format
 	ColumnFormats []int
 }
 
@@ -35,7 +33,7 @@ func ParseCopyOutResponse(r io.Reader) (*CopyOutResponse, error) {
 	}
 
 	c := &CopyOutResponse{
-		Format:        CopyOutFormat(format),
+		Format:        Format(format),
 		ColumnFormats: make([]int, count),
 	}
 
@@ -65,7 +63,7 @@ func (c *CopyOutResponse) AsMap() map[string]interface{} {
 	return map[string]interface{}{
 		"Type": "CopyOutResponse",
 		"Payload": map[string]interface{}{
-			"Format":        byte(c.Format),
+			"Format":        c.Format,
 			"ColumnFormats": c.ColumnFormats,
 		},
 	}

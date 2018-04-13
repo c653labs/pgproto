@@ -4,23 +4,6 @@ import (
 	"io"
 )
 
-type RowFormat int
-
-const (
-	RowFormatText   RowFormat = 0
-	RowFormatBinary RowFormat = 1
-)
-
-func (f RowFormat) String() string {
-	switch f {
-	case RowFormatText:
-		return "Text"
-	case RowFormatBinary:
-		return "Binary"
-	}
-	return "Unknown"
-}
-
 type RowField struct {
 	ColumnName   []byte
 	TableOID     int
@@ -28,7 +11,7 @@ type RowField struct {
 	TypeOID      int
 	ColumnLength int //int16
 	TypeModifier int
-	Format       RowFormat // int16
+	Format       Format
 }
 
 func (f RowField) AsMap() map[string]interface{} {
@@ -112,7 +95,7 @@ func ParseRowDescription(r io.Reader) (*RowDescription, error) {
 
 		// Format - int16
 		format, err := b.ReadInt16()
-		rd.Fields[i].Format = RowFormat(format)
+		rd.Fields[i].Format = Format(format)
 		if err != nil {
 			return nil, err
 		}
