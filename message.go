@@ -8,6 +8,7 @@ import (
 // Message is the main interface for all PostgreSQL messages
 type Message interface {
 	Encode() []byte
+	AsMap() map[string]interface{}
 	WriteTo(w io.Writer) (int64, error)
 	String() string
 }
@@ -150,16 +151,16 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return ParseCloseComplete(msgReader)
 	case 'W':
 		// Copy both response
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseCopyBothResponse(msgReader)
 	case 'd':
 		// Copy data
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseCopyData(msgReader)
 	case 'G':
 		// Copy in response
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseCopyInResponse(msgReader)
 	case 'H':
 		// Copy out response
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return ParseCopyOutResponse(msgReader)
 	case 'V':
 		// Function call response
 		return nil, fmt.Errorf("unhandled message tag %#v", start)

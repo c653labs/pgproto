@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -33,8 +32,12 @@ func (p *ParseComplete) Encode() []byte {
 	return buf.Bytes()
 }
 
-func (p *ParseComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-
-func (p *ParseComplete) String() string {
-	return fmt.Sprintf("ParseComplete<>")
+func (p *ParseComplete) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "ParseComplete",
+		"Payload": nil,
+	}
 }
+
+func (p *ParseComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
+func (p *ParseComplete) String() string                     { return messageToString(p) }

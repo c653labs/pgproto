@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -33,8 +32,12 @@ func (n *NoData) Encode() []byte {
 	return buf.Bytes()
 }
 
-func (n *NoData) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
-
-func (n *NoData) String() string {
-	return fmt.Sprintf("NoData<>")
+func (n *NoData) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "NoData",
+		"Payload": nil,
+	}
 }
+
+func (n *NoData) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
+func (n *NoData) String() string                     { return messageToString(n) }

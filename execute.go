@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -50,8 +49,15 @@ func (e *Execute) Encode() []byte {
 	return w.Bytes()
 }
 
-func (e *Execute) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
-
-func (e *Execute) String() string {
-	return fmt.Sprintf("Execute<Portal=%#v, MaxRows=%d>", string(e.Portal), e.MaxRows)
+func (e *Execute) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "Execute",
+		"Payload": map[string]interface{}{
+			"Portal":  string(e.Portal),
+			"MaxRows": e.MaxRows,
+		},
+	}
 }
+
+func (e *Execute) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
+func (e *Execute) String() string                     { return messageToString(e) }

@@ -35,8 +35,12 @@ func (e *EmptyQueryResponse) Encode() []byte {
 	return b.Bytes()
 }
 
-func (e *EmptyQueryResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
-
-func (e *EmptyQueryResponse) String() string {
-	return "EmptyQueryResponse<>"
+func (e *EmptyQueryResponse) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "EmptyQueryResponse",
+		"Payload": nil,
+	}
 }
+
+func (e *EmptyQueryResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
+func (e *EmptyQueryResponse) String() string                     { return messageToString(e) }

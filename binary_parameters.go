@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -69,15 +68,18 @@ func (p *BinaryParameters) Encode() []byte {
 	return b.Bytes()
 }
 
-func (p *BinaryParameters) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-
-func (p *BinaryParameters) String() string {
-	str := "BinaryParameters<"
-	for i, f := range p.Fields {
-		if i > 0 {
-			str += ", "
-		}
-		str += fmt.Sprintf("%#v", string(f))
+func (p *BinaryParameters) AsMap() map[string]interface{} {
+	f := make([]string, len(p.Fields))
+	for k, v := range p.Fields {
+		f[k] = string(v)
 	}
-	return str + ">"
+	return map[string]interface{}{
+		"Type": "BinaryParameters",
+		"Payload": map[string]interface{}{
+			"Fields": f,
+		},
+	}
 }
+
+func (p *BinaryParameters) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
+func (p *BinaryParameters) String() string                     { return messageToString(p) }

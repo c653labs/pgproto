@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -55,8 +54,14 @@ func (p *ParameterDescription) Encode() []byte {
 	return w.Bytes()
 }
 
-func (p *ParameterDescription) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-
-func (p *ParameterDescription) String() string {
-	return fmt.Sprintf("ParameterDescription<OIDs=%#v>", p.OIDs)
+func (p *ParameterDescription) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "ParameterDescription",
+		"Payload": map[string]interface{}{
+			"OIDs": p.OIDs,
+		},
+	}
 }
+
+func (p *ParameterDescription) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
+func (p *ParameterDescription) String() string                     { return messageToString(p) }

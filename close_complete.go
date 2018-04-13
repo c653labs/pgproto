@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -33,8 +32,12 @@ func (c *CloseComplete) Encode() []byte {
 	return buf.Bytes()
 }
 
-func (c *CloseComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-
-func (c *CloseComplete) String() string {
-	return fmt.Sprintf("CloseComplete<>")
+func (c *CloseComplete) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "CloseComplete",
+		"Payload": nil,
+	}
 }
+
+func (c *CloseComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
+func (c *CloseComplete) String() string                     { return messageToString(c) }

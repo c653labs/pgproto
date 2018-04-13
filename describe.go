@@ -74,8 +74,15 @@ func (d *Describe) Encode() []byte {
 	return w.Bytes()
 }
 
-func (d *Describe) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
-
-func (d *Describe) String() string {
-	return fmt.Sprintf("Describe<ObjectType=%#v, Name=%#v>", string(d.ObjectType), string(d.Name))
+func (d *Describe) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "Describe",
+		"Payload": map[string]interface{}{
+			"ObjectType": byte(d.ObjectType),
+			"Name":       string(d.Name),
+		},
+	}
 }
+
+func (d *Describe) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
+func (d *Describe) String() string                     { return messageToString(d) }

@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -33,8 +32,12 @@ func (b *BindComplete) Encode() []byte {
 	return buf.Bytes()
 }
 
-func (b *BindComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(b, w) }
-
-func (b *BindComplete) String() string {
-	return fmt.Sprintf("BindComplete<>")
+func (b *BindComplete) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "BindComplete",
+		"Payload": nil,
+	}
 }
+
+func (b *BindComplete) WriteTo(w io.Writer) (int64, error) { return writeTo(b, w) }
+func (b *BindComplete) String() string                     { return messageToString(b) }

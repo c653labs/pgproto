@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -59,8 +58,15 @@ func (c *Close) Encode() []byte {
 	return b.Bytes()
 }
 
-func (c *Close) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-
-func (c *Close) String() string {
-	return fmt.Sprintf("Close<ObjectType=%#v, Name=%#v>", string(c.ObjectType), string(c.Name))
+func (c *Close) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "Close",
+		"Payload": map[string]interface{}{
+			"ObjectType": c.ObjectType,
+			"Name":       c.Name,
+		},
+	}
 }
+
+func (c *Close) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
+func (c *Close) String() string                     { return messageToString(c) }

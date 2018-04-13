@@ -35,8 +35,12 @@ func (t *Termination) Encode() []byte {
 	return w.Bytes()
 }
 
-func (t *Termination) WriteTo(w io.Writer) (int64, error) { return writeTo(t, w) }
-
-func (t *Termination) String() string {
-	return "Termination<>"
+func (t *Termination) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "Termination",
+		"Payload": nil,
+	}
 }
+
+func (t *Termination) WriteTo(w io.Writer) (int64, error) { return writeTo(t, w) }
+func (t *Termination) String() string                     { return messageToString(t) }

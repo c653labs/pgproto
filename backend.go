@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -49,8 +48,15 @@ func (b *BackendKeyData) Encode() []byte {
 	return buf.Bytes()
 }
 
-func (b *BackendKeyData) WriteTo(w io.Writer) (int64, error) { return writeTo(b, w) }
-
-func (b *BackendKeyData) String() string {
-	return fmt.Sprintf("BackendKeyData<PID=%#v, Key=%#v>", b.PID, b.Key)
+func (b *BackendKeyData) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "BackendKeyData",
+		"Payload": map[string]interface{}{
+			"PID": b.PID,
+			"Key": b.Key,
+		},
+	}
 }
+
+func (b *BackendKeyData) WriteTo(w io.Writer) (int64, error) { return writeTo(b, w) }
+func (b *BackendKeyData) String() string                     { return messageToString(b) }

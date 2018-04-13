@@ -36,8 +36,12 @@ func (f *Flush) Encode() []byte {
 	return b.Bytes()
 }
 
-func (f *Flush) WriteTo(w io.Writer) (int64, error) { return writeTo(f, w) }
-
-func (f *Flush) String() string {
-	return "Flush<>"
+func (f *Flush) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "Flush",
+		"Payload": nil,
+	}
 }
+
+func (f *Flush) WriteTo(w io.Writer) (int64, error) { return writeTo(f, w) }
+func (f *Flush) String() string                     { return messageToString(f) }

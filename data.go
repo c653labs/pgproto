@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -69,15 +68,18 @@ func (d *DataRow) Encode() []byte {
 	return b.Bytes()
 }
 
-func (d *DataRow) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
-
-func (d *DataRow) String() string {
-	str := "DataRow<"
-	for i, f := range d.Fields {
-		if i > 0 {
-			str += ", "
-		}
-		str += fmt.Sprintf("%#v", string(f))
+func (d *DataRow) AsMap() map[string]interface{} {
+	f := make([]string, len(d.Fields))
+	for k, v := range d.Fields {
+		f[k] = string(v)
 	}
-	return str + ">"
+	return map[string]interface{}{
+		"Type": "DataRow",
+		"Payload": map[string]interface{}{
+			"Fields": f,
+		},
+	}
 }
+
+func (d *DataRow) WriteTo(w io.Writer) (int64, error) { return writeTo(d, w) }
+func (d *DataRow) String() string                     { return messageToString(d) }

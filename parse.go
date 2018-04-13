@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -68,8 +67,16 @@ func (p *Parse) Encode() []byte {
 	return w.Bytes()
 }
 
-func (p *Parse) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-
-func (p *Parse) String() string {
-	return fmt.Sprintf("Parse<Name=%#v, Query=%#v, OIDs=%#v>", string(p.Name), string(p.Query), p.OIDs)
+func (p *Parse) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "Parse",
+		"Payload": map[string]interface{}{
+			"Name":  string(p.Name),
+			"Query": string(p.Query),
+			"OIDs":  p.OIDs,
+		},
+	}
 }
+
+func (p *Parse) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
+func (p *Parse) String() string                     { return messageToString(p) }

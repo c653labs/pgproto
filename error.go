@@ -81,11 +81,9 @@ func (e *Error) Encode() []byte {
 	return encodeError(e, 'E')
 }
 
+func (e *Error) AsMap() map[string]interface{}      { return errorMap(e, "Error") }
 func (e *Error) WriteTo(w io.Writer) (int64, error) { return writeTo(e, w) }
-
-func (e *Error) String() string {
-	return errorString(e, "Error")
-}
+func (e *Error) String() string                     { return messageToString(e) }
 
 func encodeError(e *Error, tag byte) []byte {
 	b := newWriteBuffer()
@@ -124,16 +122,17 @@ func encodeError(e *Error, tag byte) []byte {
 	return b.Bytes()
 }
 
-func errorString(e *Error, name string) string {
-	return fmt.Sprintf(
-		"%s<Severity=%#v, Text=%#v, Code=%#v, Message=%#v, Position=%#v, Line=%#v, Routine=%#v>",
-		name,
-		string(e.Severity),
-		string(e.Text),
-		string(e.Code),
-		string(e.Message),
-		string(e.Position),
-		string(e.Line),
-		string(e.Routine),
-	)
+func errorMap(e *Error, name string) map[string]interface{} {
+	return map[string]interface{}{
+		"Type": name,
+		"Payload": map[string]string{
+			"Severity": string(e.Severity),
+			"Text":     string(e.Text),
+			"Code":     string(e.Code),
+			"Message":  string(e.Message),
+			"Position": string(e.Position),
+			"Line":     string(e.Line),
+			"Routine":  string(e.Routine),
+		},
+	}
 }

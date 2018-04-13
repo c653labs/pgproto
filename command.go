@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -41,8 +40,14 @@ func (c *CommandCompletion) Encode() []byte {
 	return b.Bytes()
 }
 
-func (c *CommandCompletion) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
-
-func (c *CommandCompletion) String() string {
-	return fmt.Sprintf("CommandCompletion<Tag=%#v>", string(c.Tag))
+func (c *CommandCompletion) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "CommandCompletion",
+		"Payload": map[string]string{
+			"Tag": string(c.Tag),
+		},
+	}
 }
+
+func (c *CommandCompletion) WriteTo(w io.Writer) (int64, error) { return writeTo(c, w) }
+func (c *CommandCompletion) String() string                     { return messageToString(c) }

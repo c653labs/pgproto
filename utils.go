@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"io"
 )
 
@@ -37,4 +38,25 @@ func HashPassword(user []byte, password []byte, salt []byte) []byte {
 func writeTo(m Message, w io.Writer) (int64, error) {
 	n, err := w.Write(m.Encode())
 	return int64(n), err
+}
+
+func messageToString(m Message) string {
+	data := m.AsMap()
+
+	t, _ := data["Type"]
+	p, _ := data["Payload"]
+
+	str := fmt.Sprintf("%s<", t)
+	if p, ok := p.(map[string]interface{}); ok {
+		first := true
+		for k, v := range p {
+			if !first {
+				str += ", "
+			}
+			str += fmt.Sprintf("%s=%#v", k, v)
+			first = false
+		}
+	}
+
+	return str + ">"
 }

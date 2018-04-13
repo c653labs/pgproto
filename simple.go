@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -41,8 +40,14 @@ func (q *SimpleQuery) Encode() []byte {
 	return b.Bytes()
 }
 
-func (q *SimpleQuery) String() string {
-	return fmt.Sprintf("SimpleQuery<Query=%#v>", string(q.Query))
+func (q *SimpleQuery) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "SimpleQuery",
+		"Payload": map[string]interface{}{
+			"Query": string(q.Query),
+		},
+	}
 }
 
+func (q *SimpleQuery) String() string                     { return messageToString(q) }
 func (q *SimpleQuery) WriteTo(w io.Writer) (int64, error) { return writeTo(q, w) }

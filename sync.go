@@ -35,8 +35,12 @@ func (s *Sync) Encode() []byte {
 	return b.Bytes()
 }
 
-func (s *Sync) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
-
-func (s *Sync) String() string {
-	return "Sync<>"
+func (s *Sync) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type":    "Sync",
+		"Payload": nil,
+	}
 }
+
+func (s *Sync) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
+func (s *Sync) String() string                     { return messageToString(s) }

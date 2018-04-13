@@ -91,9 +91,16 @@ func (a *AuthenticationRequest) Encode() []byte {
 	return w.Bytes()
 }
 
+func (a *AuthenticationRequest) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "AuthenticationRequest",
+		"Payload": map[string]interface{}{
+			"Method": int(a.Method),
+			"Salt":   a.Salt,
+		},
+	}
+}
+
 // WriteTo will write the byte representation of this AuthenticationRequest to the provided writer
 func (a *AuthenticationRequest) WriteTo(w io.Writer) (int64, error) { return writeTo(a, w) }
-
-func (a *AuthenticationRequest) String() string {
-	return fmt.Sprintf("AuthenticationRequest<Method=%v, Salt=%v>", a.Method, a.Salt)
-}
+func (a *AuthenticationRequest) String() string                     { return messageToString(a) }

@@ -15,12 +15,12 @@ func ParseNoticeResponse(r io.Reader) (*NoticeResponse, error) {
 
 func (n *NoticeResponse) server() {}
 
-func (n *NoticeResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
-
 func (n *NoticeResponse) Encode() []byte {
 	return encodeError((*Error)(n), 'N')
 }
 
-func (n *NoticeResponse) String() string {
-	return errorString((*Error)(n), "NoticeResponse")
+func (n *NoticeResponse) AsMap() map[string]interface{} {
+	return errorMap((*Error)(n), "NoticeResponse")
 }
+func (n *NoticeResponse) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
+func (n *NoticeResponse) String() string                     { return messageToString(n) }

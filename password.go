@@ -2,7 +2,6 @@ package pgproto
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 )
 
@@ -53,8 +52,13 @@ func (p *PasswordMessage) Encode() []byte {
 	return w.Bytes()
 }
 
-func (p *PasswordMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
-
-func (p *PasswordMessage) String() string {
-	return fmt.Sprintf("PasswordMessage<Password=%#v>", string(p.Password))
+func (p *PasswordMessage) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "PasswordMessage",
+		"Payload": map[string]interface{}{
+			"Password": p.Password,
+		},
+	}
 }
+func (p *PasswordMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(p, w) }
+func (p *PasswordMessage) String() string                     { return messageToString(p) }

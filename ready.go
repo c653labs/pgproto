@@ -59,8 +59,14 @@ func (r *ReadyForQuery) Encode() []byte {
 	return b.Bytes()
 }
 
-func (r *ReadyForQuery) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
-
-func (r *ReadyForQuery) String() string {
-	return fmt.Sprintf("ReadyForQuery<Status=%s>", r.Status)
+func (r *ReadyForQuery) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "ReadyForQuery",
+		"Payload": map[string]interface{}{
+			"Status": r.Status,
+		},
+	}
 }
+
+func (r *ReadyForQuery) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
+func (r *ReadyForQuery) String() string                     { return messageToString(r) }

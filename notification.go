@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -59,8 +58,16 @@ func (n *Notification) Encode() []byte {
 	return buf.Bytes()
 }
 
-func (n *Notification) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
-
-func (n *Notification) String() string {
-	return fmt.Sprintf("Notification<PID=%#v, Channel=%#v, Payload=%#v>", n.PID, string(n.Channel), string(n.Payload))
+func (n *Notification) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "Notification",
+		"Payload": map[string]interface{}{
+			"PID":     n.PID,
+			"Channel": string(n.Channel),
+			"Payload": string(n.Payload),
+		},
+	}
 }
+
+func (n *Notification) WriteTo(w io.Writer) (int64, error) { return writeTo(n, w) }
+func (n *Notification) String() string                     { return messageToString(n) }

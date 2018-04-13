@@ -1,7 +1,6 @@
 package pgproto
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -32,11 +31,16 @@ type RowField struct {
 	Format       RowFormat // int16
 }
 
-func (f RowField) String() string {
-	return fmt.Sprintf(
-		"%s<TableOID=%#v, ColumnIndex=%#v, TypeOID=%#v, ColumnLength=%#v, TypeModifier=%#v, Format=%s>",
-		f.ColumnName, f.TableOID, f.ColumnIndex, f.TypeOID, f.ColumnLength, f.TypeModifier, f.Format,
-	)
+func (f RowField) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"ColumnName":   f.ColumnName,
+		"TableOID":     f.TableOID,
+		"ColumnIndex":  f.ColumnIndex,
+		"TypeOID":      f.TypeOID,
+		"ColumnLength": f.ColumnLength,
+		"TypeModifier": f.TypeModifier,
+		"Format":       f.Format,
+	}
 }
 
 type RowDescription struct {
@@ -148,15 +152,18 @@ func (r *RowDescription) Encode() []byte {
 	return b.Bytes()
 }
 
-func (r *RowDescription) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
-
-func (r *RowDescription) String() string {
-	str := "RowDescription<"
-	for i, f := range r.Fields {
-		if i > 0 {
-			str += ", "
-		}
-		str += f.String()
+func (r *RowDescription) AsMap() map[string]interface{} {
+	fields := make([]map[string]interface{}, 0)
+	for _, f := range r.Fields {
+		fields = append(fields, f.AsMap())
 	}
-	return str + ">"
+	return map[string]interface{}{
+		"Type": "RowDescription",
+		"Payload": map[string]interface{}{
+			"Fields": fields,
+		},
+	}
 }
+
+func (r *RowDescription) WriteTo(w io.Writer) (int64, error) { return writeTo(r, w) }
+func (r *RowDescription) String() string                     { return messageToString(r) }

@@ -96,27 +96,16 @@ func (s *StartupMessage) Encode() []byte {
 	return w.Bytes()
 }
 
-func (s *StartupMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
-
-func (s *StartupMessage) String() string {
-	str := fmt.Sprintf("StartupMessage<")
-	if s.SSLRequest {
-		str += "SSLRequest"
-	} else {
-		str += fmt.Sprintf("Protocol=%#v", ProtocolVersion)
+func (s *StartupMessage) AsMap() map[string]interface{} {
+	return map[string]interface{}{
+		"Type": "StartupMessage",
+		"Payload": map[string]interface{}{
+			"SSLRequest": s.SSLRequest,
+			"Protocol":   ProtocolVersion,
+			"Options":    s.Options,
+		},
 	}
-	str += fmt.Sprintf(", Options<")
-
-	keys := make([]string, 0)
-	for k, _ := range s.Options {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	for i, k := range keys {
-		if i > 0 {
-			str += ", "
-		}
-		str += fmt.Sprintf("%s=%#v", k, string(s.Options[k]))
-	}
-	return str + ">>"
 }
+
+func (s *StartupMessage) WriteTo(w io.Writer) (int64, error) { return writeTo(s, w) }
+func (s *StartupMessage) String() string                     { return messageToString(s) }
