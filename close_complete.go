@@ -4,10 +4,12 @@ import (
 	"io"
 )
 
+// CloseComplete represents a server response message
 type CloseComplete struct{}
 
 func (c *CloseComplete) server() {}
 
+// ParseCloseComplete will attempt to read a CloseComplete message from the io.Reader
 func ParseCloseComplete(r io.Reader) (*CloseComplete, error) {
 	buf := newReadBuffer(r)
 
@@ -38,7 +40,6 @@ func (c *CloseComplete) Encode() []byte {
 //   map[string]interface{}{
 //     "Type": "CloseComplete",
 //     "Payload": nil,
-//     },
 //   }
 func (c *CloseComplete) AsMap() map[string]interface{} {
 	return map[string]interface{}{

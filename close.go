@@ -4,30 +4,15 @@ import (
 	"io"
 )
 
-type CloseType byte
-
-const (
-	CloseTypePreparedStatement CloseType = 'S'
-	CloseTypePortal                      = 'P'
-)
-
-func (c CloseType) String() string {
-	switch c {
-	case CloseTypePreparedStatement:
-		return "PreparedStatement"
-	case CloseTypePortal:
-		return "Portal"
-	}
-	return "Uknown"
-}
-
+// Close represents a client request message
 type Close struct {
-	ObjectType CloseType
+	ObjectType ObjectType
 	Name       []byte
 }
 
 func (c *Close) client() {}
 
+// ParseClose will attempt to read a Close message from the io.Reader
 func ParseClose(r io.Reader) (*Close, error) {
 	b := newReadBuffer(r)
 
@@ -41,7 +26,7 @@ func ParseClose(r io.Reader) (*Close, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.ObjectType = CloseType(t)
+	c.ObjectType = ObjectType(t)
 	c.Name, err = b.ReadString(stripNull)
 	if err != nil {
 		return nil, err

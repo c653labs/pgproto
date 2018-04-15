@@ -16,6 +16,7 @@ func bytesToInt16(buf []byte) int {
 	return int(int16(binary.BigEndian.Uint16(buf)))
 }
 
+// HashPassword helper function is used to compute the hash of a user's password
 func HashPassword(user []byte, password []byte, salt []byte) []byte {
 	digest := md5.New()
 	digest.Write(password)
@@ -35,6 +36,7 @@ func HashPassword(user []byte, password []byte, salt []byte) []byte {
 	return append([]byte("md5"), dst...)
 }
 
+// WriteTo helper function is used to write the binary representation of a Message to an io.Writer
 func WriteTo(m Message, w io.Writer) (int64, error) {
 	n, err := w.Write(m.Encode())
 	return int64(n), err

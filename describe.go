@@ -5,24 +5,8 @@ import (
 	"io"
 )
 
-type DescribeObjectType byte
-
-func (t DescribeObjectType) String() string {
-	if t == DescribeObjectTypePreparedStatement {
-		return "PreparedStatement"
-	} else if t == DescribeObjectTypePortal {
-		return "Portal"
-	}
-	return "Unknown"
-}
-
-const (
-	DescribeObjectTypePreparedStatement DescribeObjectType = 'S'
-	DescribeObjectTypePortal                               = 'P'
-)
-
 type Describe struct {
-	ObjectType DescribeObjectType
+	ObjectType ObjectType
 	Name       []byte
 }
 
@@ -49,9 +33,9 @@ func ParseDescribe(r io.Reader) (*Describe, error) {
 		return nil, err
 	}
 
-	switch o := DescribeObjectType(t); o {
-	case DescribeObjectTypePreparedStatement:
-	case DescribeObjectTypePortal:
+	switch o := ObjectType(t); o {
+	case ObjectTypePreparedStatement:
+	case ObjectTypePortal:
 		d.ObjectType = o
 	default:
 		return nil, fmt.Errorf("unknown describe object type %#v", t)
