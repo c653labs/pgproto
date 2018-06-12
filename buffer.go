@@ -23,6 +23,9 @@ const (
 
 type readBuffer struct {
 	io.Reader
+	oneByte   [1]byte
+	twoBytes  [2]byte
+	fourBytes [4]byte
 }
 
 func newReadBuffer(r io.Reader) *readBuffer {
@@ -38,8 +41,7 @@ func newReadBuffer(r io.Reader) *readBuffer {
 }
 
 func (b *readBuffer) ReadInt() (int, error) {
-	var buf [4]byte
-	n, err := b.Read(buf[:])
+	n, err := b.Read(b.fourBytes[:])
 	if err != nil {
 		return 0, err
 	}
@@ -47,12 +49,11 @@ func (b *readBuffer) ReadInt() (int, error) {
 		return 0, io.EOF
 	}
 
-	return bytesToInt(buf[:]), nil
+	return bytesToInt(b.fourBytes[:]), nil
 }
 
 func (b *readBuffer) ReadInt16() (int, error) {
-	var buf [2]byte
-	n, err := b.Read(buf[:])
+	n, err := b.Read(b.twoBytes[:])
 	if err != nil {
 		return 0, err
 	}
@@ -60,7 +61,7 @@ func (b *readBuffer) ReadInt16() (int, error) {
 		return 0, io.EOF
 	}
 
-	return bytesToInt16(buf[:]), nil
+	return bytesToInt16(b.twoBytes[:]), nil
 }
 
 func (b *readBuffer) ReadLength() (*readBuffer, error) {
@@ -92,10 +93,9 @@ func (b *readBuffer) ReadLength() (*readBuffer, error) {
 }
 
 func (b *readBuffer) ReadByte() (c byte, err error) {
-	var buf [1]byte
-	l, err := b.Read(buf[:])
+	l, err := b.Read(b.oneByte[:])
 	if l == 1 {
-		c = buf[0]
+		c = b.oneByte[0]
 	}
 	return
 }
@@ -144,7 +144,10 @@ func (b *readBuffer) ReadTag(t byte) error {
 }
 
 type writeBuffer struct {
-	bytes []byte
+	bytes     []byte
+	oneByte   [1]byte
+	twoBytes  [2]byte
+	fourBytes [4]byte
 }
 
 func newWriteBuffer() *writeBuffer {
@@ -156,15 +159,13 @@ func (b *writeBuffer) Bytes() []byte {
 }
 
 func (b *writeBuffer) WriteInt(i int) {
-	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[:], uint32(i))
-	b.bytes = append(b.bytes, buf[:]...)
+	binary.BigEndian.PutUint32(b.fourBytes[:], uint32(i))
+	b.bytes = append(b.bytes, b.fourBytes[:]...)
 }
 
 func (b *writeBuffer) WriteInt16(i int) {
-	var buf [2]byte
-	binary.BigEndian.PutUint16(buf[:], uint16(i))
-	b.bytes = append(b.bytes, buf[:]...)
+	binary.BigEndian.PutUint16(b.twoBytes[:], uint16(i))
+	b.bytes = append(b.bytes, b.twoBytes[:]...)
 }
 
 func (b *writeBuffer) WriteBytes(buf []byte) {
@@ -186,13 +187,13 @@ func (b *writeBuffer) WriteString(buf []byte, null nullWrite) {
 func (b *writeBuffer) PrependLength() {
 	// Need to include the 4 bytes as part of the length
 	l := len(b.bytes) + 4
-	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[:], uint32(l))
-	b.bytes = append(buf[:], b.bytes...)
+	binary.BigEndian.PutUint32(b.fourBytes[:], uint32(l))
+	b.bytes = append(b.fourBytes[:], b.bytes...)
 }
 
 func (b *writeBuffer) PrependByte(c byte) {
-	b.bytes = append([]byte{c}, b.bytes...)
+	b.oneByte[0] = c
+	b.bytes = append(b.oneByte[:], b.bytes...)
 }
 
 func (b *writeBuffer) Wrap(t byte) {
