@@ -23,9 +23,11 @@ func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_Empty()
 }
 
 func BenchmarkAuthenticationRequestParse_Empty(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		pgproto.ParseAuthenticationRequest(bytes.NewReader([]byte{}))
-	}
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			pgproto.ParseAuthenticationRequest(bytes.NewReader([]byte{}))
+		}
+	})
 }
 
 func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_MD5() {
@@ -60,12 +62,14 @@ func BenchmarkAuthenticationRequestParse_MD5(b *testing.B) {
 		'\xd1', '\x5b', '\x0e', '\x4f',
 	}
 
-	for i := 0; i < b.N; i++ {
-		_, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
-		if err != nil {
-			b.Error(err)
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			_, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
+			if err != nil {
+				b.Error(err)
+			}
 		}
-	}
+	})
 }
 
 func (s *AuthenticationRequestTestSuite) Test_AuthenticationRequestEncode_MD5() {
@@ -92,9 +96,11 @@ func BenchmarkAuthenticationRequestEncode_MD5(b *testing.B) {
 		Method: pgproto.AuthenticationMethodMD5,
 		Salt:   []byte{'\xd1', '\x5b', '\x0e', '\x4f'},
 	}
-	for i := 0; i < b.N; i++ {
-		a.Encode()
-	}
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			a.Encode()
+		}
+	})
 }
 
 func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_Plaintext() {
@@ -127,12 +133,14 @@ func BenchmarkAuthenticationRequestParse_Plaintext(b *testing.B) {
 		// Salt
 	}
 
-	for i := 0; i < b.N; i++ {
-		_, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
-		if err != nil {
-			b.Error(err)
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			_, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
+			if err != nil {
+				b.Error(err)
+			}
 		}
-	}
+	})
 }
 
 func (s *AuthenticationRequestTestSuite) Test_AuthenticationRequestEncode_Plaintext() {
@@ -157,9 +165,11 @@ func BenchmarkAuthenticationRequestEncode_Plaintext(b *testing.B) {
 		Method: pgproto.AuthenticationMethodPlaintext,
 		Salt:   []byte{'\xd1', '\x5b', '\x0e', '\x4f'},
 	}
-	for i := 0; i < b.N; i++ {
-		a.Encode()
-	}
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			a.Encode()
+		}
+	})
 }
 
 func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_OK() {
@@ -190,12 +200,14 @@ func BenchmarkAuthenticationRequestParse_OK(b *testing.B) {
 		'\x00', '\x00', '\x00', '\x00',
 	}
 
-	for i := 0; i < b.N; i++ {
-		_, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
-		if err != nil {
-			b.Error(err)
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			_, err := pgproto.ParseAuthenticationRequest(bytes.NewReader(raw))
+			if err != nil {
+				b.Error(err)
+			}
 		}
-	}
+	})
 }
 
 func (s *AuthenticationRequestTestSuite) Test_AuthenticationRequestEncode_OK() {
@@ -220,7 +232,9 @@ func BenchmarkAuthenticationRequestEncode_OK(b *testing.B) {
 		Method: pgproto.AuthenticationMethodOK,
 		Salt:   nil,
 	}
-	for i := 0; i < b.N; i++ {
-		a.Encode()
-	}
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			a.Encode()
+		}
+	})
 }

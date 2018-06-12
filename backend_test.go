@@ -48,12 +48,14 @@ func BenchmarkBackendKeyData_MD5(b *testing.B) {
 		'\x00', '\x00', '\x04', '\xd2',
 	}
 
-	for i := 0; i < b.N; i++ {
-		_, err := pgproto.ParseBackendKeyData(bytes.NewReader(raw))
-		if err != nil {
-			b.Error(err)
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			_, err := pgproto.ParseBackendKeyData(bytes.NewReader(raw))
+			if err != nil {
+				b.Error(err)
+			}
 		}
-	}
+	})
 }
 
 func (s *BackendKeyDataTestSuite) Test_ParseBackendKeyData_Empty() {
@@ -63,9 +65,11 @@ func (s *BackendKeyDataTestSuite) Test_ParseBackendKeyData_Empty() {
 }
 
 func BenchmarkBackendKeyData_Empty(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		pgproto.ParseBackendKeyData(bytes.NewReader([]byte{}))
-	}
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			pgproto.ParseBackendKeyData(bytes.NewReader([]byte{}))
+		}
+	})
 }
 
 func (s *BackendKeyDataTestSuite) Test_BackendKeyDataEncode() {
@@ -92,7 +96,9 @@ func BenchmarkBackendKeyDataEncode(b *testing.B) {
 		PID: 1234,
 		Key: 1234,
 	}
-	for i := 0; i < b.N; i++ {
-		m.Encode()
-	}
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			m.Encode()
+		}
+	})
 }
