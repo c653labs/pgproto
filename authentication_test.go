@@ -22,7 +22,7 @@ func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_Empty()
 	s.Nil(auth)
 }
 
-func BenchmarkParseAuthenticationRequestParse_Empty(b *testing.B) {
+func BenchmarkAuthenticationRequestParse_Empty(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		pgproto.ParseAuthenticationRequest(bytes.NewReader([]byte{}))
 	}
@@ -48,7 +48,7 @@ func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_MD5() {
 	s.Equal(raw, auth.Encode())
 }
 
-func BenchmarkParseAuthenticationRequestParse_MD5(b *testing.B) {
+func BenchmarkAuthenticationRequestParse_MD5(b *testing.B) {
 	raw := []byte{
 		// Tag
 		'R',
@@ -116,7 +116,7 @@ func (s *AuthenticationRequestTestSuite) Test_ParseAuthenticationRequest_Plainte
 	s.Equal(raw, auth.Encode())
 }
 
-func BenchmarkParseAuthenticationRequestParse_Plaintext(b *testing.B) {
+func BenchmarkAuthenticationRequestParse_Plaintext(b *testing.B) {
 	raw := []byte{
 		// Tag
 		'R',
