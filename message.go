@@ -49,6 +49,7 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 		}
 		return ParseStartupMessage(msgReader)
 	default:
+		// Read the entire next message from the input reader
 		msgReader, err := readMessage(start, buf)
 		if err != nil {
 			return nil, err
@@ -104,6 +105,7 @@ func ParseServerMessage(r io.Reader) (ServerMessage, error) {
 		return nil, err
 	}
 
+	// Read the entire next message from the input reader
 	msgReader, err := readMessage(start, buf)
 	if err != nil {
 		return nil, err
@@ -184,17 +186,18 @@ func readStartupMessage(start byte, buf *readBuffer) (io.Reader, error) {
 	// [int32 - length] [payload]
 	// StartupMessage
 	// Read the next 3 bytes, prepend with the 1 we already read to parse the length from this message
-	b := make([]byte, 3)
-	_, err := buf.Read(b)
+	s := [4]byte{
+		start,
+	}
+	_, err := buf.Read(s[1:])
 	if err != nil {
 		return nil, err
 	}
-	b = append([]byte{start}, b...)
-	l := bytesToInt(b)
+	l := bytesToInt(s[:])
 
 	// Read the rest of the message into a []byte
 	// DEV: Subtract 4 to account for the length of the in32 we just read
-	b = make([]byte, l-4)
+	b := make([]byte, l-4)
 	_, err = buf.Read(b)
 	if err != nil {
 		return nil, err
