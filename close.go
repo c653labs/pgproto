@@ -16,6 +16,7 @@ func (c *Close) client() {}
 func ParseClose(r io.Reader) (*Close, error) {
 	b := newReadBuffer(r)
 
+	// 'C' [int32 - length] [byte - object type] [bytes - name]
 	err := b.ReadTag('C')
 	if err != nil {
 		return nil, err

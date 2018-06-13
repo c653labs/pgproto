@@ -15,7 +15,7 @@ func (c *CommandCompletion) server() {}
 func ParseCommandCompletion(r io.Reader) (*CommandCompletion, error) {
 	b := newReadBuffer(r)
 
-	// 'C' [int32 - length] [tag] \0
+	// 'C' [int32 - length] [bytes - tag] \0
 	err := b.ReadTag('C')
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func ParseCommandCompletion(r io.Reader) (*CommandCompletion, error) {
 	}
 
 	c := &CommandCompletion{}
-	c.Tag, err = b.ReadString(true)
+	c.Tag, err = b.ReadString(stripNull)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func ParseCommandCompletion(r io.Reader) (*CommandCompletion, error) {
 // Encode will return the byte representation of this message
 func (c *CommandCompletion) Encode() []byte {
 	b := newWriteBuffer()
-	b.WriteString(c.Tag, true)
+	b.WriteString(c.Tag, writeNull)
 	b.Wrap('C')
 	return b.Bytes()
 }

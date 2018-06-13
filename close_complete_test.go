@@ -75,7 +75,7 @@ func (s *CloseCompleteTestSuite) Test_EncodeCloseComplete() {
 	s.Equal(expected, close.Encode())
 }
 
-func BenchmarkCloseComplete(b *testing.B) {
+func BenchmarkCloseCompleteEncode(b *testing.B) {
 	close := &pgproto.CloseComplete{}
 	b.RunParallel(func(p *testing.PB) {
 		for p.Next() {
