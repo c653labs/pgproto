@@ -27,9 +27,12 @@ func ParseParseComplete(r io.Reader) (*ParseComplete, error) {
 
 func (p *ParseComplete) Encode() []byte {
 	// '1' [int32 - length]
-	buf := newWriteBuffer()
-	buf.Wrap('1')
-	return buf.Bytes()
+	return []byte{
+		// Tag
+		'1',
+		// Length
+		'\x00', '\x00', '\x00', '\x04',
+	}
 }
 
 // AsMap method returns a common map representation of this message:

@@ -30,9 +30,12 @@ func ParseBindComplete(r io.Reader) (*BindComplete, error) {
 // Encode will return the byte representation of this message
 func (b *BindComplete) Encode() []byte {
 	// '2' [int32 - length]
-	buf := newWriteBuffer()
-	buf.Wrap('2')
-	return buf.Bytes()
+	return []byte{
+		// Tag
+		'2',
+		// Length
+		'\x00', '\x00', '\x00', '\x04',
+	}
 }
 
 // AsMap method returns a common map representation of this message:

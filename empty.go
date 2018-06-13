@@ -12,6 +12,7 @@ func (e *EmptyQueryResponse) server() {}
 func ParseEmptyQueryResponse(r io.Reader) (*EmptyQueryResponse, error) {
 	b := newReadBuffer(r)
 
+	// 'I' [int32 - length]
 	err := b.ReadTag('I')
 	if err != nil {
 		return nil, err
@@ -30,9 +31,13 @@ func ParseEmptyQueryResponse(r io.Reader) (*EmptyQueryResponse, error) {
 }
 
 func (e *EmptyQueryResponse) Encode() []byte {
-	b := newWriteBuffer()
-	b.Wrap('I')
-	return b.Bytes()
+	// 'I' [int32 - length]
+	return []byte{
+		// Tag
+		'I',
+		// Length
+		'\x00', '\x00', '\x00', '\x04',
+	}
 }
 
 func (e *EmptyQueryResponse) AsMap() map[string]interface{} {

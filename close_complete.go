@@ -30,9 +30,12 @@ func ParseCloseComplete(r io.Reader) (*CloseComplete, error) {
 // Encode will return the byte representation of this message
 func (c *CloseComplete) Encode() []byte {
 	// '3' [int32 - length]
-	buf := newWriteBuffer()
-	buf.Wrap('3')
-	return buf.Bytes()
+	return []byte{
+		// Tag
+		'3',
+		// Length
+		'\x00', '\x00', '\x00', '\x04',
+	}
 }
 
 // AsMap method returns a common map representation of this message:
