@@ -96,89 +96,93 @@ func ParseClientMessage(r io.Reader) (ClientMessage, error) {
 
 // ParseServerMessage will read the next ServerMessage from the provided io.Reader
 func ParseServerMessage(r io.Reader) (ServerMessage, error) {
-	// Create a buffer
-	buf := newReadBuffer(r)
-
-	// Look at the first byte to determine the type of message we have
-	start, err := buf.ReadByte()
+	msg, err := ParseRawMessage(r)
 	if err != nil {
 		return nil, err
 	}
+	// // Create a buffer
+	// buf := newReadBuffer(r)
 
-	// Read the entire next message from the input reader
-	msgReader, err := readMessage(start, buf)
-	if err != nil {
-		return nil, err
-	}
+	// // Look at the first byte to determine the type of message we have
+	// start, err := buf.ReadByte()
+	// if err != nil {
+	//	return nil, err
+	// }
+
+	// // Read the entire next message from the input reader
+	// msgReader, err := readMessage(start, buf)
+	// if err != nil {
+	//	return nil, err
+	// }
 
 	// Message
 	//   [char - tag] [int32 - length] [payload]
-	switch start {
+	switch msg.Type {
 	case 'R':
 		// Authentication request
-		return ParseAuthenticationRequest(msgReader)
+		return ParseAuthenticationRequest(msg.Reader())
 	case 'S':
 		// Parameter status
-		return ParseParameterStatus(msgReader)
+		return ParseParameterStatus(msg.Reader())
 	case 'K':
 		// Backend key data
-		return ParseBackendKeyData(msgReader)
+		return ParseBackendKeyData(msg.Reader())
 	case 'Z':
 		// Ready for query
-		return ParseReadyForQuery(msgReader)
+		return ParseReadyForQuery(msg.Reader())
 	case 'C':
 		// Command completion
-		return ParseCommandCompletion(msgReader)
+		return ParseCommandCompletion(msg.Reader())
 	case 'T':
 		// Row description
-		return ParseRowDescription(msgReader)
+		return ParseRowDescription(msg.Reader())
 	case 't':
 		// Parameter description
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return nil, fmt.Errorf("unhandled message tag %#v", msg.Type)
 	case 'D':
 		// Data row
-		return ParseDataRow(msgReader)
+		return ParseDataRow(msg.Reader())
 	case 'I':
 		// Empty query response
-		return ParseEmptyQueryResponse(msgReader)
+		return ParseEmptyQueryResponse(msg.Reader())
 	case '1':
 		// Parse complete
-		return ParseParseComplete(msgReader)
+		return ParseParseComplete(msg.Reader())
 	case '2':
 		// Bind complete
-		return ParseBindComplete(msgReader)
+		return ParseBindComplete(msg.Reader())
 	case '3':
 		// Close complete
-		return ParseCloseComplete(msgReader)
+		return ParseCloseComplete(msg.Reader())
 	case 'W':
 		// Copy both response
-		return ParseCopyBothResponse(msgReader)
+		return ParseCopyBothResponse(msg.Reader())
 	case 'd':
 		// Copy data
-		return ParseCopyData(msgReader)
+		return ParseCopyData(msg.Reader())
 	case 'G':
 		// Copy in response
-		return ParseCopyInResponse(msgReader)
+		return ParseCopyInResponse(msg.Reader())
 	case 'H':
 		// Copy out response
-		return ParseCopyOutResponse(msgReader)
+		return ParseCopyOutResponse(msg.Reader())
 	case 'V':
 		// Function call response
-		return nil, fmt.Errorf("unhandled message tag %#v", start)
+		return nil, fmt.Errorf("unhandled message tag %#v", msg.Type)
 	case 'n':
 		// No data
-		return ParseNoData(msgReader)
+		return ParseNoData(msg.Reader())
 	case 'N':
 		// Notice response
-		return ParseNoticeResponse(msgReader)
+		return ParseNoticeResponse(msg.Reader())
 	case 'A':
 		// Notification response
-		return ParseNotification(msgReader)
+		return ParseNotification(msg.Reader())
 	case 'E':
 		// Error message
-		return ParseError(msgReader)
+		return ParseError(msg.Reader())
 	default:
-		return nil, fmt.Errorf("unknown message tag '%c'", start)
+		return nil, fmt.Errorf("unknown message tag '%c'", msg.Type)
 	}
 }
 
