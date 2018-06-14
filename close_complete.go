@@ -1,8 +1,18 @@
 package pgproto
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 )
+
+// '3' [int32 - length]
+var rawCloseCompleteMessage = [5]byte{
+	// Tag
+	'3',
+	// Length
+	'\x00', '\x00', '\x00', '\x04',
+}
 
 // CloseComplete represents a server response message
 type CloseComplete struct{}
@@ -11,17 +21,16 @@ func (c *CloseComplete) server() {}
 
 // ParseCloseComplete will attempt to read a CloseComplete message from the io.Reader
 func ParseCloseComplete(r io.Reader) (*CloseComplete, error) {
-	buf := newReadBuffer(r)
+	b := newReadBuffer(r)
 
-	// '3' [int32 - length]
-	err := buf.ReadTag('3')
+	var msg [5]byte
+	_, err := b.Read(msg[:])
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = buf.ReadLength()
-	if err != nil {
-		return nil, err
+	if !bytes.Equal(msg[:], rawCloseCompleteMessage[:]) {
+		return nil, fmt.Errorf("invalid close complete message")
 	}
 
 	return &CloseComplete{}, nil
@@ -30,12 +39,7 @@ func ParseCloseComplete(r io.Reader) (*CloseComplete, error) {
 // Encode will return the byte representation of this message
 func (c *CloseComplete) Encode() []byte {
 	// '3' [int32 - length]
-	return []byte{
-		// Tag
-		'3',
-		// Length
-		'\x00', '\x00', '\x00', '\x04',
-	}
+	return rawCloseCompleteMessage[:]
 }
 
 // AsMap method returns a common map representation of this message:

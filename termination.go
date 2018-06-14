@@ -1,9 +1,18 @@
 package pgproto
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 )
+
+// 'X' [int32 - length]
+var rawTerminationMessage = [5]byte{
+	// Tag
+	'X',
+	// Length
+	'\x00', '\x00', '\x00', '\x04',
+}
 
 type Termination struct{}
 
@@ -12,27 +21,21 @@ func (t *Termination) client() {}
 func ParseTermination(r io.Reader) (*Termination, error) {
 	b := newReadBuffer(r)
 
-	// 'X' [int32 - length]
-	err := b.ReadTag('X')
+	var msg [5]byte
+	_, err := b.Read(msg[:])
 	if err != nil {
 		return nil, err
 	}
 
-	l, err := b.ReadInt()
-	if err != nil {
-		return nil, err
-	}
-	if l != 4 {
-		return nil, fmt.Errorf("invalid length for termination message, must be 4")
+	if !bytes.Equal(msg[:], rawTerminationMessage[:]) {
+		return nil, fmt.Errorf("invalid termination message")
 	}
 	return &Termination{}, nil
 }
 
 func (t *Termination) Encode() []byte {
 	// 'X' [int32 - length]
-	w := newWriteBuffer()
-	w.Wrap('X')
-	return w.Bytes()
+	return rawTerminationMessage[:]
 }
 
 func (t *Termination) AsMap() map[string]interface{} {

@@ -8,6 +8,14 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+// 'X' [int32 - length]
+var rawTerminationMessage = [5]byte{
+	// Tag
+	'X',
+	// Length
+	'\x00', '\x00', '\x00', '\x04',
+}
+
 type TerminationTestSuite struct {
 	suite.Suite
 }
@@ -17,12 +25,21 @@ func TestTerminationTestSuite(t *testing.T) {
 }
 
 func (s *TerminationTestSuite) Test_ParseTermination() {
-	raw := []byte{'X', '\x00', '\x00', '\x00', '\x04'}
-
-	term, err := pgproto.ParseTermination(bytes.NewReader(raw))
+	term, err := pgproto.ParseTermination(bytes.NewReader(rawTerminationMessage[:]))
 	s.Nil(err)
 	s.NotNil(term)
-	s.Equal(raw, term.Encode())
+	s.Equal(rawTerminationMessage[:], term.Encode())
+}
+
+func BenchmarkParseTermination(b *testing.B) {
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			_, err := pgproto.ParseTermination(bytes.NewReader(rawTerminationMessage[:]))
+			if err != nil {
+				b.Error(err)
+			}
+		}
+	})
 }
 
 func (s *TerminationTestSuite) Test_ParseTermination_Empty() {
@@ -57,8 +74,15 @@ func (s *TerminationTestSuite) Test_ParseTermination_InvalidLength() {
 }
 
 func (s *TerminationTestSuite) Test_Termination_Encode() {
-	expected := []byte{'X', '\x00', '\x00', '\x00', '\x04'}
-
 	term := &pgproto.Termination{}
-	s.Equal(expected, term.Encode())
+	s.Equal(rawTerminationMessage[:], term.Encode())
+}
+
+func BenchmarkTermination_Encode(b *testing.B) {
+	term := &pgproto.Termination{}
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			term.Encode()
+		}
+	})
 }
