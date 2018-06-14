@@ -238,3 +238,44 @@ func BenchmarkAuthenticationRequestEncode_OK(b *testing.B) {
 		}
 	})
 }
+
+func (s *AuthenticationRequestTestSuite) Test_AuthenticationRequest_ParseServerMessage() {
+	raw := []byte{
+		// Tag
+		'R',
+		// Length
+		'\x00', '\x00', '\x00', '\x08',
+		// Method
+		'\x00', '\x00', '\x00', '\x00',
+	}
+
+	m, err := pgproto.ParseServerMessage(bytes.NewReader(raw))
+	a, ok := m.(*pgproto.AuthenticationRequest)
+	s.True(ok)
+	s.Nil(err)
+	s.NotNil(a)
+	s.Equal(a.Method, pgproto.AuthenticationMethodOK)
+	s.Nil(a.Salt)
+	s.Equal(raw, a.Encode())
+	s.Equal(raw, m.Encode())
+}
+
+func BenchmarkAuthenticationRequest_ParseServerMessage(b *testing.B) {
+	raw := []byte{
+		// Tag
+		'R',
+		// Length
+		'\x00', '\x00', '\x00', '\x08',
+		// Method
+		'\x00', '\x00', '\x00', '\x00',
+	}
+
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			_, err := pgproto.ParseServerMessage(bytes.NewReader(raw))
+			if err != nil {
+				b.Error(err)
+			}
+		}
+	})
+}
