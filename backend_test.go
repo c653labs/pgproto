@@ -16,7 +16,7 @@ func TestBackendKeyDataTestSuite(t *testing.T) {
 	suite.Run(t, new(BackendKeyDataTestSuite))
 }
 
-func (s *BackendKeyDataTestSuite) Test_ParseBackendKeyData_MD5() {
+func (s *BackendKeyDataTestSuite) Test_ParseBackendKeyData() {
 	raw := []byte{
 		// Tag
 		'K',
@@ -36,7 +36,7 @@ func (s *BackendKeyDataTestSuite) Test_ParseBackendKeyData_MD5() {
 	s.Equal(raw, backend.Encode())
 }
 
-func BenchmarkBackendKeyData_MD5(b *testing.B) {
+func BenchmarkBackendKeyDataParse(b *testing.B) {
 	raw := []byte{
 		// Tag
 		'K',
@@ -64,7 +64,7 @@ func (s *BackendKeyDataTestSuite) Test_ParseBackendKeyData_Empty() {
 	s.Nil(backend)
 }
 
-func BenchmarkBackendKeyData_Empty(b *testing.B) {
+func BenchmarkBackendKeyDataParse_Empty(b *testing.B) {
 	b.RunParallel(func(p *testing.PB) {
 		for p.Next() {
 			pgproto.ParseBackendKeyData(bytes.NewReader([]byte{}))
@@ -99,6 +99,51 @@ func BenchmarkBackendKeyDataEncode(b *testing.B) {
 	b.RunParallel(func(p *testing.PB) {
 		for p.Next() {
 			m.Encode()
+		}
+	})
+}
+
+func (s *BackendKeyDataTestSuite) Test_BackendKeyData_ParseServerRequest() {
+	raw := []byte{
+		// Tag
+		'K',
+		// Length
+		'\x00', '\x00', '\x00', '\x0c',
+		// PID
+		'\x00', '\x00', '\x04', '\xd2',
+		// Key
+		'\x00', '\x00', '\x04', '\xd2',
+	}
+
+	m, err := pgproto.ParseServerMessage(bytes.NewReader(raw))
+	backend, ok := m.(*pgproto.BackendKeyData)
+	s.Nil(err)
+	s.True(ok)
+	s.NotNil(backend)
+	s.Equal(backend.PID, 1234)
+	s.Equal(backend.Key, 1234)
+	s.Equal(raw, backend.Encode())
+	s.Equal(raw, m.Encode())
+}
+
+func BenchmarkBackendKeyData_ParseServerMessage(b *testing.B) {
+	raw := []byte{
+		// Tag
+		'K',
+		// Length
+		'\x00', '\x00', '\x00', '\x0c',
+		// PID
+		'\x00', '\x00', '\x04', '\xd2',
+		// Key
+		'\x00', '\x00', '\x04', '\xd2',
+	}
+
+	b.RunParallel(func(p *testing.PB) {
+		for p.Next() {
+			_, err := pgproto.ParseServerMessage(bytes.NewReader(raw))
+			if err != nil {
+				b.Error(err)
+			}
 		}
 	})
 }
