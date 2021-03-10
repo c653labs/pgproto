@@ -72,3 +72,14 @@ func messageToString(m Message) string {
 
 	return str + ">"
 }
+
+func ReadNBytes(r io.Reader, n int) ([]byte, error) {
+	expectedSlice := make([]byte, n)
+	for i := 0; i < n; i++ {
+		_, err := r.Read(expectedSlice[i : i+1])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return expectedSlice, nil
+}

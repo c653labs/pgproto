@@ -124,7 +124,7 @@ func encodeError(e *Error, tag byte) []byte {
 func errorMap(e *Error, name string) map[string]interface{} {
 	return map[string]interface{}{
 		"Type": name,
-		"Payload": map[string]string{
+		"Payload": map[string]interface{}{
 			"Severity": string(e.Severity),
 			"Text":     string(e.Text),
 			"Code":     string(e.Code),
